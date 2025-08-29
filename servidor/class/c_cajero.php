@@ -71,108 +71,32 @@ class cajero extends basedatos
     }
 
     // Métodos CRUD implementados de la clase abstracta
-
-    /**
-     * Consulta un cajero por su ID
-     */
-    public function consultar()
-    {
-        $sql = sprintf("SELECT * FROM cajeros WHERE id = %d", $this->id);
-        $this->conectar();
-        $this->ejecutarSQL($sql);
-        $res = $this->cargarRegistro();
-        $this->desconectar();
-
-        if ($res) {
-            $this->nombre = $res['nombre'];
-            $this->cod_banco = $res['cod_banco'];
-            $this->puesto = $res['puesto'];
-            $this->ranking = $res['ranking'];
-            return true;
-        }
-        return false;
+    public function listar() {
+        $sql = "SELECT c.id, c.nombre, c.cod_banco, b.nombre AS banco_nombre, c.puesto, c.ranking
+                FROM cajero c
+                JOIN banco b ON c.cod_banco = b.id";
+        return $this->query($sql)->fetchAll(PDO::FETCH_ASSOC);
     }
-
-    /**
-     * Inserta un nuevo cajero en la base de datos
-     */
-    public function insertar()
-    {
-        $sql = sprintf(
-            "INSERT INTO cajeros (nombre, cod_banco, puesto, ranking) VALUES ('%s', %d, '%s', %d)",
-            $this->nombre,
-            $this->cod_banco,
-            $this->puesto,
-            $this->ranking
-        );
-        $this->conectar();
-        $result = $this->ejecutarSQL($sql);
-        $this->desconectar();
-        return $result;
+    public function crear($nombre, $cod_banco, $puesto, $ranking) {
+        $sql = "INSERT INTO cajero (nombre, cod_banco, puesto, ranking) VALUES (?, ?, ?, ?)";
+        $stmt = $this->prepare($sql);
+        return $stmt->execute([$nombre, $cod_banco, $puesto, $ranking]);
     }
-
-    /**
-     * Actualiza un cajero existente en la base de datos
-     */
-    public function actualizar()
-    {
-        $sql = sprintf(
-            "UPDATE cajeros SET nombre = '%s', cod_banco = %d, puesto = '%s', ranking = %d WHERE id = %d",
-            $this->nombre,
-            $this->cod_banco,
-            $this->puesto,
-            $this->ranking,
-            $this->id
-        );
-        $this->conectar();
-        $result = $this->ejecutarSQL($sql);
-        $this->desconectar();
-        return $result;
+    public function editar($id, $nombre, $cod_banco, $puesto, $ranking) {
+        $sql = "UPDATE cajero SET nombre = ?, cod_banco = ?, puesto = ?, ranking = ? WHERE id = ?";
+        $stmt = $this->prepare($sql);
+        return $stmt->execute([$nombre, $cod_banco, $puesto, $ranking, $id]);
     }
-
-    /**
-     * Elimina un cajero de la base de datos
-     */
-    public function eliminar()
-    {
-        $sql = sprintf("DELETE FROM cajeros WHERE id = %d", $this->id);
-        $this->conectar();
-        $result = $this->ejecutarSQL($sql);
-        $this->desconectar();
-        return $result;
+    public function eliminar($id) {
+        $sql = "DELETE FROM cajero WHERE id = ?";
+        $stmt = $this->prepare($sql);
+        return $stmt->execute([$id]);
     }
-
-    /**
-     * Lista todos los cajeros con información del banco
-     */
-    public function listar()
-    {
-        $sql = "SELECT c.*, b.nombre as nombre_banco 
-                FROM cajeros c 
-                LEFT JOIN banco b ON c.cod_banco = b.codigo 
-                ORDER BY c.ranking ASC, c.nombre ASC";
-        $this->conectar();
-        $this->ejecutarSQL($sql);
-        $res = $this->cargarTodo();
-        $this->desconectar();
-        return $res;
+    public function consultar($id) {
+        $sql = "SELECT * FROM cajero WHERE id = ?";
+        $stmt = $this->prepare($sql);
+        $stmt->execute([$id]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
-
-    public function validarBanco($cod_banco){
-    // Acepta solo enteros positivos
-    if ($cod_banco === null || $cod_banco === '' || !is_numeric($cod_banco)) {
-        return false;
-    }
-    $cod_banco = (int)$cod_banco;
-
-    // Consulta directa usando las utilidades de basedatos
-    $sql = sprintf("SELECT 1 FROM banco WHERE codigo = %d LIMIT 1", $cod_banco);
-    $this->conectar();
-    $this->ejecutarSQL($sql);
-    $res = $this->cargarRegistro();
-    $this->desconectar();
-
-    return $res !== false;
-}
 }
 ?>
