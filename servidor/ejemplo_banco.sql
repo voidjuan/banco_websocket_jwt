@@ -61,15 +61,16 @@ CREATE TABLE usuarios (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+
+-- Crear la tabla cajero
 CREATE TABLE IF NOT EXISTS cajero (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    nombre VARCHAR(100) NOT NULL,
+    nombre VARCHAR(255) NOT NULL,
     cod_banco INT NOT NULL,
-    puesto VARCHAR(100),
-    ranking INT,
-    FOREIGN KEY (cod_banco) REFERENCES banco(codigo)
+    puesto VARCHAR(100) NOT NULL,
+    ranking INT NOT NULL CHECK (ranking BETWEEN 1 AND 5),
+    FOREIGN KEY (cod_banco) REFERENCES banco(codigo) ON DELETE CASCADE ON UPDATE CASCADE
 );
-
 
 -- Todos los usuarios tienen la contraseña hasheada con bcrypt
 -- La contraseña en texto plano es 'password'

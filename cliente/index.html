@@ -1,192 +1,147 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Banco - WebSocket con Autenticación</title>
-    <link rel="stylesheet" href="css/style.css">
+    <title>Sistema de Gestión Bancaria</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .section { margin-bottom: 20px; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
+        .modal-content { background: white; margin: 15% auto; padding: 20px; width: 50%; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        button { margin-right: 5px; }
+        #avisoError { padding: 10px; margin-bottom: 10px; display: none; }
+    </style>
 </head>
-
 <body>
-    <!-- Sección de Login -->
-    <div id="loginSection">
-        <h1>Iniciar Sesión</h1>
-        <div id="avisoError" class="error-message"></div>
-        <form id="loginForm">
-            <div class="form-group">
-                <label for="username">Usuario:</label>
-                <input type="text" id="username" required>
-            </div>
-            <div class="form-group">
-                <label for="password">Contraseña:</label>
-                <input type="password" id="password" required>
-            </div>
-            <div class="form-actions">
-                <button type="button" id="loginBtn" class="btn btn-primary">Ingresar</button>
-            </div>
-        </form>
+    <div id="avisoError"></div>
+
+    <div id="loginSection" class="section">
+        <h2>Iniciar Sesión</h2>
+        <div>
+            <label>Usuario: <input type="text" id="username"></label>
+        </div>
+        <div>
+            <label>Contraseña: <input type="password" id="password"></label>
+        </div>
+        <button id="loginBtn">Ingresar</button>
     </div>
 
-    <!-- Sección Principal (visible solo cuando se autentica) -->
-    <div id="mainSection" style="display:none;">
-        <header class="header">
-            <h1>Listado de Bancos</h1>
-            <div class="user-controls">
-                <span id="perfilInfo" class="user-info"></span>
-                <button id="perfilBtn" class="btn btn-secondary">Mi Perfil</button>
-                <button id="logoutBtn" class="btn btn-danger">Cerrar Sesión</button>
-            </div>
-        </header>
+    <div id="mainSection" class="section" style="display: none;">
+        <div id="perfilInfo"></div>
+        <button id="perfilBtn">Mi Perfil</button>
+        <button id="logoutBtn">Cerrar Sesión</button>
 
-        <div class="toolbar">
-            <button id="nuevoBanco" class="btn btn-primary">Crear Nuevo Banco</button>
-        </div>
-
-        <table id="tablaBancos" class="data-table">
+        <h2>Listado de Bancos</h2>
+        <button id="nuevoBanco">Crear Nuevo Banco</button>
+        <table>
             <thead>
                 <tr>
                     <th>Código</th>
                     <th>Nombre</th>
-                    <th>Código transacción</th>
+                    <th>Código Transacción</th>
                     <th>Acciones</th>
                 </tr>
             </thead>
-            <tbody id="cuerpoTabla">
-                <!-- Los datos se cargarán dinámicamente -->
-            </tbody>
+            <tbody id="cuerpoTabla"></tbody>
         </table>
 
-        <section>
-            <h1>Listado de Cajeros</h1>
-            <div class="toolbar">
-                <button id="nuevoCajero" class="btn btn-primary">Crear Nuevo Cajero</button>
-            </div>
-        </section>
-        <table id="tablaCajeros" class="data-table">
+        <h2>Listado de Cajeros</h2>
+        <button id="nuevoCajero">Crear Nuevo Cajero</button>
+        <table>
             <thead>
                 <tr>
                     <th>Id</th>
                     <th>Nombre</th>
                     <th>Cod_Banco</th>
-                    <th>Puesto</th> 
+                    <th>Puesto</th>
                     <th>Ranking</th>
                     <th>Acciones</th>
                 </tr>
             </thead>
-            <tbody id="cuerpoTabla2">
-                <!-- Los datos se cargarán dinámicamente -->
-            </tbody>
+            <tbody id="cuerpoTabla2"></tbody>
         </table>
+    </div>
 
-        <!-- Modal para crear/editar banco -->
-        <div id="bancoModal" class="modal">
-            <div class="modal-content">
-                <h2 id="modalTitulo">Nuevo Banco</h2>
-                <form id="bancoForm">
-                    <input type="hidden" id="codigo">
-                    <div class="form-group">
-                        <label for="nombre">Nombre:</label>
-                        <input type="text" id="nombre" required maxlength="200">
-                    </div>
-                    <div class="form-group">
-                        <label for="cod_transaccion">Código Transacción:</label>
-                        <input type="text" id="cod_transaccion" required maxlength="4">
-                    </div>
-                    <div class="modal-actions">
-                        <button type="submit" class="btn btn-primary">Guardar</button>
-                        <button type="reset" class="btn btn-secondary">Limpiar</button>
-                        <button type="button" id="cancelar" class="btn btn-danger">Cancelar</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <!-- Modal para crear/editar Cajero -->
-        <div id="cajeroModal" class="modal">
-            <div class="modal-content">
-                <h2 id="modalTitulo2">Nuevo Cajero</h2>
-                <form id="cajeroForm">
-                    <input type="hidden" id="id">
-                    <div class="form-group">
-                        <label for="nombre">Nombre:</label>
-                        <input type="text" id="nombre2" required maxlength="200">
-                    </div>
-                    <div class="form-group">
-                        <label for="cod_banco">Código Banco:</label>
-                        <input type="number" id="cod_banco" required maxlength="5">
-                    </div>
-                    <div class="form-group">
-                        <label for="puesto">Puesto:</label>
-                        <input type="text" id="puesto" required maxlength="200">
-                    </div>
-                    <div class="form-group">
-                        <label for="ranking">Ranking:</label>
-                        <input type="number" id="ranking" required maxlength="1">
-                    </div>
-                    <div class="modal-actions">
-                        <button type="submit" class="btn btn-primary">Guardar</button>
-                        <button type="reset" class="btn btn-secondary">Limpiar</button>
-                        <button type="button" id="cancelar2" class="btn btn-danger">Cancelar</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <!-- Modal de Perfil -->
-        <div id="perfilModal" class="modal">
-            <div class="modal-content">
-                <h2>Mi Perfil</h2>
-                <form id="perfilForm">
-                    <div class="form-group">
-                        <label for="editNombre">Nombre:</label>
-                        <input type="text" id="editNombre" class="editable-field">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="editUsername">Usuario:</label>
-                        <div id="viewUsername" class="readonly-field"></div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="editEmail">Email:</label>
-                        <input type="email" id="editEmail" class="editable-field">
-                    </div>
-                    
-                    <div class="form-group" id="rolContainer">
-                        <label for="editRol">Rol:</label>
-                        <div id="viewRol" class="readonly-field"></div>
-                        <select id="editRol" class="editable-field" style="display:none;">
-                            <option value="lector">Lector</option>
-                            <option value="editor">Editor</option>
-                            <option value="admin">Administrador</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group" id="passwordContainer" style="display:none;">
-                        <label for="currentPassword">Contraseña Actual:</label>
-                        <input type="password" id="currentPassword">
-                        
-                        <label for="newPassword">Nueva Contraseña:</label>
-                        <input type="password" id="newPassword">
-                        
-                        <label for="confirmPassword">Confirmar Nueva Contraseña:</label>
-                        <input type="password" id="confirmPassword">
-                    </div>
-                    
-                    <div class="modal-actions">
-                        <button type="button" id="editarPerfilBtn" class="btn btn-primary">Editar Perfil</button>
-                        <button type="button" id="cambiarPasswordBtn" class="btn btn-secondary">Cambiar Contraseña</button>
-                        <button type="button" id="guardarPerfilBtn" class="btn btn-success" style="display:none;">Guardar Cambios</button>
-                        <button type="button" id="cancelarEdicionBtn" class="btn btn-danger" style="display:none;">Cancelar</button>
-                        <button type="button" id="cerrarPerfil" class="btn btn-secondary">Cerrar</button>
-                    </div>
-                </form>
-            </div>
+    <div id="bancoModal" class="modal">
+        <div class="modal-content">
+            <h2 id="modalTitulo">Nuevo Banco</h2>
+            <form id="bancoForm">
+                <input type="hidden" id="codigo">
+                <div>
+                    <label>Nombre: <input type="text" id="nombre"></label>
+                </div>
+                <div>
+                    <label>Código Transacción: <input type="text" id="cod_transaccion"></label>
+                </div>
+                <button type="submit">Guardar</button>
+                <button type="reset">Limpiar</button>
+                <button type="button" id="cancelar">Cancelar</button>
+            </form>
         </div>
     </div>
 
-    <script src="js/banco.js"></script>
-</body>
+    <div id="cajeroModal" class="modal">
+        <div class="modal-content">
+            <h2 id="modalTitulo2">Nuevo Cajero</h2>
+            <form id="cajeroForm">
+                <input type="hidden" id="id">
+                <div>
+                    <label>Nombre: <input type="text" id="nombre2"></label>
+                </div>
+                <div>
+                    <label>Código Banco: <input type="text" id="cod_banco"></label>
+                </div>
+                <div>
+                    <label>Puesto: <input type="text" id="puesto"></label>
+                </div>
+                <div>
+                    <label>Ranking: <input type="text" id="ranking"></label>
+                </div>
+                <button type="submit">Guardar</button>
+                <button type="reset">Limpiar</button>
+                <button type="button" id="cancelar2">Cancelar</button>
+            </form>
+        </div>
+    </div>
 
+    <div id="perfilModal" class="modal">
+        <div class="modal-content">
+            <h2>Mi Perfil</h2>
+            <div>
+                <label>Nombre: <input type="text" id="editNombre" style="display: none;"></label>
+            </div>
+            <div>
+                <label>Usuario: <span id="viewUsername"></span></label>
+            </div>
+            <div>
+                <label>Email: <input type="email" id="editEmail" style="display: none;"></label>
+            </div>
+            <div>
+                <label>Rol: <span id="viewRol"></span>
+                    <select id="editRol" style="display: none;">
+                        <option value="lector">Lector</option>
+                        <option value="editor">Editor</option>
+                        <option value="admin">Administrador</option>
+                    </select>
+                </label>
+            </div>
+            <div id="passwordContainer" style="display: none;">
+                <label>Contraseña Actual: <input type="password" id="currentPassword"></label>
+                <label>Nueva Contraseña: <input type="password" id="newPassword"></label>
+                <label>Confirmar Nueva Contraseña: <input type="password" id="confirmPassword"></label>
+            </div>
+            <button id="editarPerfilBtn">Editar Perfil</button>
+            <button id="cambiarPasswordBtn">Cambiar Contraseña</button>
+            <button id="guardarPerfilBtn" style="display: none;">Guardar Cambios</button>
+            <button id="cancelarEdicionBtn" style="display: none;">Cancelar</button>
+            <button id="cerrarPerfil">Cerrar</button>
+        </div>
+    </div>
+
+    <script src="banco.js"></script>
+    <script src="cajero.js"></script>
+</body>
 </html>

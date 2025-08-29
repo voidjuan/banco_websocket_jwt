@@ -1,11 +1,9 @@
-hphp// Establece conexión WebSocket con el servidor
 const socket = new WebSocket('ws://localhost:8080');
 let bancos = [];
-let cajeros = [];
 let usuarioActual = null;
 let token = localStorage.getItem('jwtToken') || null;
 
-// Elementos del DOM existentes...
+// Elementos del DOM
 const loginSection = document.getElementById('loginSection');
 const mainSection = document.getElementById('mainSection');
 const usernameInput = document.getElementById('username');
@@ -42,18 +40,12 @@ const currentPassword = document.getElementById('currentPassword');
 const newPassword = document.getElementById('newPassword');
 const confirmPassword = document.getElementById('confirmPassword');
 
-// Mostrar/ocultar secciones según autenticación
 function actualizarInterfaz() {
     if (usuarioActual) {
         loginSection.style.display = 'none';
         mainSection.style.display = 'block';
         perfilInfo.textContent = `Bienvenido, ${usuarioActual.nombre} (${usuarioActual.rol})`;
-
-        // Mostrar/ocultar botones según rol
         nuevoBancoBtn.style.display = ['editor', 'admin'].includes(usuarioActual.rol) ? 'block' : 'none';
-        if (nuevoCajeroBtn) {
-            nuevoCajeroBtn.style.display = ['editor', 'admin'].includes(usuarioActual.rol) ? 'block' : 'none';
-        }
     } else {
         loginSection.style.display = 'block';
         mainSection.style.display = 'none';
@@ -61,17 +53,14 @@ function actualizarInterfaz() {
     }
 }
 
-// Muestra un mensaje de aviso/error
 function mostrarAviso(mensaje, esError = true) {
     if (!avisoError) return;
-
     avisoError.textContent = mensaje;
     avisoError.style.display = 'block';
     avisoError.style.color = esError ? 'red' : 'green';
     setTimeout(ocultarAviso, 5000);
 }
 
-// Oculta el aviso/error
 function ocultarAviso() {
     if (avisoError) {
         avisoError.textContent = '';
@@ -79,26 +68,76 @@ function ocultarAviso() {
     }
 }
 
-// Evento cuando se establece la conexión WebSocket
+function cargarBancos() {
+    socket.send(JSON.stringify({ action: 'listar', token: token }));
+}
+
+function actualizarTablaBancos() {
+    cuerpoTabla.innerHTML = '';
+    if (!bancos || bancos.length === 0) {
+        mostrarAviso('No hay bancos registrados.', false);
+        return;
+    }
+    bancos.forEach(banco => {
+        const fila = document.createElement('tr');
+        fila.innerHTML = `
+            <td>${banco.codigo}</td>
+            <td>${banco.nombre}</td>
+            <td>${banco.cod_transaccion}</td>
+            <td>
+                ${usuarioActual.rol !== 'lector' ? `<button onclick="editarBanco(${banco.codigo})">Editar</button>` : ''}
+                ${usuarioActual.rol === 'admin' ? `<button onclick="eliminarBanco(${banco.codigo})">Eliminar</button>` : ''}
+                <button onclick="consultarBanco(${banco.codigo})">Consultar</button>
+            </td>
+        `;
+        cuerpoTabla.appendChild(fila);
+    });
+}
+
+function editarBanco(codigo) {
+    socket.send(JSON.stringify({ action: 'consultar', codigo: codigo, token: token }));
+    socket.addEventListener('message', function handleMessage(event) {
+        const response = JSON.parse(event.data);
+        if (response.action === 'consultar' && response.status === 'success') {
+            modalTitulo.textContent = 'Editar Banco';
+            codigoInput.value = response.data.codigo;
+            nombreInput.value = response.data.nombre;
+            codTransaccionInput.value = response.data.cod_transaccion;
+            bancoModal.style.display = 'block';
+        }
+        socket.removeEventListener('message', handleMessage);
+    });
+}
+
+function eliminarBanco(codigo) {
+    if (confirm('¿Confirmar eliminación del banco?')) {
+        socket.send(JSON.stringify({ action: 'eliminar', codigo: codigo, token: token }));
+    }
+}
+
+function consultarBanco(codigo) {
+    socket.send(JSON.stringify({ action: 'consultar', codigo: codigo, token: token }));
+    socket.addEventListener('message', function handleMessage(event) {
+        const response = JSON.parse(event.data);
+        if (response.action === 'consultar' && response.status === 'success') {
+            alert(`Código: ${response.data.codigo}\nNombre: ${response.data.nombre}\nCód. Transacción: ${response.data.cod_transaccion}`);
+        }
+        socket.removeEventListener('message', handleMessage);
+    });
+}
+
 socket.onopen = function (e) {
     console.log('Conexión establecida');
     actualizarInterfaz();
-
-    // Intento de autologin si hay token almacenado
     if (token) {
-        socket.send(JSON.stringify({
-            action: 'login',
-            token: token
-        }));
+        socket.send(JSON.stringify({ action: 'login', token: token }));
     }
 };
 
-// Evento cuando se recibe un mensaje del servidor WebSocket
 socket.onmessage = function (event) {
     try {
         const response = JSON.parse(event.data);
         ocultarAviso();
-
         switch (response.action) {
             case 'login':
                 if (response.status === 'success') {
@@ -107,13 +146,12 @@ socket.onmessage = function (event) {
                     localStorage.setItem('jwtToken', token);
                     actualizarInterfaz();
                     cargarBancos();
-                    cargarCajeros();
+                    cargarCajeros(); // Definida en cajero.js
                     mostrarAviso('Sesión iniciada correctamente', false);
                 } else {
                     mostrarAviso(response.message || 'Error en el login');
                 }
                 break;
-
             case 'logout':
                 if (response.status === 'success') {
                     usuarioActual = null;
@@ -125,7 +163,6 @@ socket.onmessage = function (event) {
                     mostrarAviso(response.message || 'Error al cerrar sesión');
                 }
                 break;
-
             case 'perfil':
                 if (response.status === 'success') {
                     mostrarPerfil(response.usuario);
@@ -133,7 +170,6 @@ socket.onmessage = function (event) {
                     mostrarAviso(response.message || 'Error al cargar perfil');
                 }
                 break;
-
             case 'actualizarPerfil':
                 if (response.status === 'success') {
                     usuarioActual = response.usuario;
@@ -146,11 +182,10 @@ socket.onmessage = function (event) {
                     mostrarAviso(response.message || 'Error al actualizar perfil');
                 }
                 break;
-
             case 'listar':
                 if (response.status === 'success') {
                     bancos = response.data;
-                    actualizarTabla();
+                    actualizarTablaBancos();
                     if (!bancos || bancos.length === 0) {
                         mostrarAviso('No hay bancos registrados.', false);
                     }
@@ -158,342 +193,94 @@ socket.onmessage = function (event) {
                     mostrarAviso(response.message || 'Error al listar bancos.');
                 }
                 break;
-
-            case 'listarCajeros':
-                if (response.status === 'success') {
-                    cajeros = response.data;
-                    actualizarTablaCajeros();
-                    if (!cajeros || cajeros.length === 0) {
-                        mostrarAviso('No hay cajeros registrados.', false);
-                    }
-                } else {
-                    mostrarAviso(response.message || 'Error al listar cajeros.');
-                }
-                break;
-
             case 'crear':
             case 'actualizar':
             case 'eliminar':
-            case 'crearCajero':
-            case 'actualizarCajero':
-            case 'eliminarCajero':
                 if (response.status === 'success') {
-                    mostrarAviso(`Operación ${response.action} realizada con éxito`, false);
+                    cargarBancos();
+                    mostrarAviso(response.message, false);
                 } else {
-                    mostrarAviso(response.message || `Error en la operación ${response.action}`);
+                    mostrarAviso(response.message || 'Error en la operación');
                 }
                 break;
-
             case 'notificacion':
-                if (response.tipo === 'actualizacion') {
+                if (response.tipo === 'actualizacionBancos') {
                     cargarBancos();
                 } else if (response.tipo === 'actualizacionCajeros') {
                     cargarCajeros();
                 }
                 break;
-
-            default:
-                if (response.status === 'error') {
-                    mostrarAviso(response.message);
-                }
         }
     } catch (e) {
-        console.error('Error al procesar mensaje:', e);
-        mostrarAviso('Error al procesar la respuesta del servidor');
+        mostrarAviso('Error al procesar mensaje del servidor');
     }
 };
 
-// Evento cuando se cierra la conexión WebSocket
-socket.onclose = function (event) {
-    if (event.wasClean) {
-        console.log(`Conexión cerrada limpiamente, código=${event.code} motivo=${event.reason}`);
-    } else {
-        console.log('La conexión se cayó');
-        mostrarAviso('Conexión perdida. Intentando reconectar...');
-        setTimeout(() => {
-            window.location.reload();
-        }, 5000);
-    }
-};
-
-// Evento cuando ocurre un error en la conexión WebSocket
-socket.onerror = function (error) {
-    console.log(`Error en WebSocket: ${error.message}`);
-    mostrarAviso('Error de conexión con el servidor');
-};
-
-// Función para mostrar el perfil del usuario
 function mostrarPerfil(usuario) {
-    if (!perfilModal || !editNombre || !viewUsername || !editEmail || !viewRol || !editRol) {
-        console.error('Elementos del modal de perfil no encontrados');
-        return;
-    }
-
+    if (!perfilModal) return;
     editNombre.value = usuario.nombre;
-    viewUsername.textContent = usuario.username;
     editEmail.value = usuario.email;
+    viewUsername.textContent = usuario.username;
     viewRol.textContent = usuario.rol;
     editRol.value = usuario.rol;
-
-    // Configurar según rol
-    if (usuarioActual.rol !== 'admin') {
-        editRol.style.display = 'none';
-        viewRol.style.display = 'block';
-    }
-
-    // Resetear campos de contraseña
-    if (passwordContainer) {
-        passwordContainer.style.display = 'none';
-    }
-    if (currentPassword) currentPassword.value = '';
-    if (newPassword) newPassword.value = '';
-    if (confirmPassword) confirmPassword.value = '';
-
-    // Configurar botones
-    if (editarPerfilBtn) editarPerfilBtn.style.display = 'inline-block';
-    if (guardarPerfilBtn) guardarPerfilBtn.style.display = 'none';
-    if (cancelarEdicionBtn) cancelarEdicionBtn.style.display = 'none';
-    if (cambiarPasswordBtn) cambiarPasswordBtn.style.display = 'inline-block';
-
-    // Mostrar modal
     perfilModal.style.display = 'block';
 }
 
-// Carga la lista de bancos desde el servidor
-function cargarBancos() {
-    socket.send(JSON.stringify({
-        action: 'listar',
-        token: token
-    }));
-}
-
-// Carga la lista de cajeros desde el servidor
-function cargarCajeros() {
-    socket.send(JSON.stringify({
-        action: 'listarCajeros',
-        token: token
-    }));
-}
-
-// Actualiza la tabla HTML con los datos de los bancos
-function actualizarTabla() {
-    if (!cuerpoTabla) return;
-
-    cuerpoTabla.innerHTML = '';
-
-    if (!bancos || bancos.length === 0) {
-        const tr = document.createElement('tr');
-        tr.innerHTML = '<td colspan="4" style="text-align: center;">No hay bancos registrados</td>';
-        cuerpoTabla.appendChild(tr);
-        return;
-    }
-
-    bancos.forEach(banco => {
-        const tr = document.createElement('tr');
-
-        let botones = '';
-        if (usuarioActual) {
-            if (usuarioActual.rol === 'admin') {
-                botones = `
-                    <button onclick="editarBanco(${banco.codigo})">Editar</button>
-                    <button onclick="eliminarBanco(${banco.codigo})">Eliminar</button>
-                `;
-            } else if (usuarioActual.rol === 'editor') {
-                botones = `
-                    <button onclick="editarBanco(${banco.codigo})">Editar</button>
-                `;
-            } else {
-                botones = '<span>Solo lectura</span>';
-            }
-        }
-
-        tr.innerHTML = `
-            <td>${banco.codigo}</td>
-            <td>${banco.nombre}</td>
-            <td>${banco.cod_transaccion}</td>
-            <td>${botones}</td>
-        `;
-        cuerpoTabla.appendChild(tr);
-    });
-}
-
-// Actualiza la tabla HTML con los datos de los cajeros
-function actualizarTablaCajeros() {
-    if (!cuerpoTabla2) return;
-
-    cuerpoTabla2.innerHTML = '';
-
-    if (!cajeros || cajeros.length === 0) {
-        const tr = document.createElement('tr');
-        tr.innerHTML = '<td colspan="6" style="text-align: center;">No hay cajeros registrados</td>';
-        cuerpoTabla2.appendChild(tr);
-        return;
-    }
-
-    cajeros.forEach(cajero => {
-        const tr = document.createElement('tr');
-
-        let botones = '';
-        if (usuarioActual) {
-            if (usuarioActual.rol === 'admin') {
-                botones = `
-                    <button onclick="editarCajero(${cajero.id})">Editar</button>
-                    <button onclick="eliminarCajero(${cajero.id})">Eliminar</button>
-                `;
-            } else if (usuarioActual.rol === 'editor') {
-                botones = `
-                    <button onclick="editarCajero(${cajero.id})">Editar</button>
-                `;
-            } else {
-                botones = '<span>Solo lectura</span>';
-            }
-        }
-
-        tr.innerHTML = `
-            <td>${cajero.id}</td>
-            <td>${cajero.nombre}</td>
-            <td>${cajero.cod_banco} - ${cajero.nombre_banco || 'Sin banco'}</td>
-            <td>${cajero.puesto}</td>
-            <td>${cajero.ranking}</td>
-            <td>${botones}</td>
-        `;
-        cuerpoTabla2.appendChild(tr);
-    });
-}
-
-// Prepara el formulario para editar un banco existente
-function editarBanco(codigo) {
-    const banco = bancos.find(b => b.codigo == codigo);
-    if (!banco) {
-        mostrarAviso('Banco no encontrado');
-        return;
-    }
-
-    if (modalTitulo) modalTitulo.textContent = 'Editar Banco';
-    if (codigoInput) codigoInput.value = banco.codigo;
-    if (nombreInput) nombreInput.value = banco.nombre;
-    if (codTransaccionInput) codTransaccionInput.value = banco.cod_transaccion;
-    if (bancoModal) bancoModal.style.display = 'block';
-}
-
-// Prepara el formulario para editar un cajero existente
-function editarCajero(id) {
-    const cajero = cajeros.find(c => c.id == id);
-    if (!cajero) {
-        mostrarAviso('Cajero no encontrado');
-        return;
-    }
-    
-    if (modalTitulo2) modalTitulo2.textContent = 'Editar Cajero';
-    if (idInput) idInput.value = cajero.id;
-    if (nombreInput2) nombreInput2.value = cajero.nombre;
-    if (codBancoInput) codBancoInput.value = cajero.cod_banco;
-    if (puestoInput) puestoInput.value = cajero.puesto;
-    if (rankingInput) rankingInput.value = cajero.ranking;
-    if (cajeroModal) cajeroModal.style.display = 'block'
-}
-
-// Solicita al servidor eliminar un banco
-function eliminarBanco(codigo) {
-    if (confirm('¿Está seguro de eliminar este banco? Esta acción no se puede deshacer.')) {
-        socket.send(JSON.stringify({
-            action: 'eliminar',
-            codigo: codigo,
-            token: token
-        }));
-    }
-}
-
-// Solicita al servidor eliminar un cajero
-function eliminarCajero(id) {
-    if (confirm('¿Está seguro de eliminar este cajero? Esta acción no se puede deshacer.')) {
-        socket.send(JSON.stringify({
-            action: 'eliminarCajero',
-            id: id,
-            token: token
-        }));
-    }
-}
-
-// Habilitar edición del perfil
 function habilitarEdicionPerfil() {
-    if (!editNombre || !editEmail || !viewUsername || !viewRol || !editRol) return;
-
-    editNombre.style.display = 'block';
-    editEmail.style.display = 'block';
+    if (!editNombre || !editEmail || !editRol) return;
+    editNombre.style.display = 'inline-block';
+    editEmail.style.display = 'inline-block';
+    if (usuarioActual.rol === 'admin') {
+        editRol.style.display = 'inline-block';
+    }
     viewUsername.style.display = 'none';
     viewRol.style.display = 'none';
-
-    if (usuarioActual.rol === 'admin') {
-        editRol.style.display = 'block';
-    }
-
-    if (editarPerfilBtn) editarPerfilBtn.style.display = 'none';
-    if (guardarPerfilBtn) guardarPerfilBtn.style.display = 'inline-block';
-    if (cancelarEdicionBtn) cancelarEdicionBtn.style.display = 'inline-block';
-    if (cambiarPasswordBtn) cambiarPasswordBtn.style.display = 'none';
-    if (passwordContainer) passwordContainer.style.display = 'none';
+    editarPerfilBtn.style.display = 'none';
+    guardarPerfilBtn.style.display = 'inline-block';
+    cancelarEdicionBtn.style.display = 'inline-block';
+    cambiarPasswordBtn.style.display = 'none';
 }
 
-// Cancelar edición del perfil
 function cancelarEdicionPerfil() {
     if (!usuarioActual || !editNombre || !editEmail || !editRol) return;
-
     editNombre.value = usuarioActual.nombre;
     editEmail.value = usuarioActual.email;
     editRol.value = usuarioActual.rol;
-
     editNombre.style.display = 'none';
     editEmail.style.display = 'none';
     editRol.style.display = 'none';
-
-    if (viewUsername) viewUsername.style.display = 'block';
-    if (viewRol) viewRol.style.display = 'block';
-
-    if (viewUsername) viewUsername.textContent = usuarioActual.username;
-    if (viewRol) viewRol.textContent = usuarioActual.rol;
-
-    if (editarPerfilBtn) editarPerfilBtn.style.display = 'inline-block';
-    if (guardarPerfilBtn) guardarPerfilBtn.style.display = 'none';
-    if (cancelarEdicionBtn) cancelarEdicionBtn.style.display = 'none';
-    if (cambiarPasswordBtn) cambiarPasswordBtn.style.display = 'inline-block';
-    if (passwordContainer) passwordContainer.style.display = 'none';
+    viewUsername.style.display = 'block';
+    viewRol.style.display = 'block';
+    viewUsername.textContent = usuarioActual.username;
+    viewRol.textContent = usuarioActual.rol;
+    editarPerfilBtn.style.display = 'inline-block';
+    guardarPerfilBtn.style.display = 'none';
+    cancelarEdicionBtn.style.display = 'none';
+    cambiarPasswordBtn.style.display = 'inline-block';
+    passwordContainer.style.display = 'none';
 }
 
-// Event Listeners existentes...
 if (loginBtn) {
     loginBtn.addEventListener('click', () => {
         const username = usernameInput?.value.trim();
         const password = passwordInput?.value.trim();
-
         if (!username || !password) {
             mostrarAviso('Por favor ingrese usuario y contraseña');
             return;
         }
-
-        socket.send(JSON.stringify({
-            action: 'login',
-            username: username,
-            password: password
-        }));
+        socket.send(JSON.stringify({ action: 'login', username: username, password: password }));
     });
 }
 
 if (logoutBtn) {
     logoutBtn.addEventListener('click', () => {
-        socket.send(JSON.stringify({
-            action: 'logout',
-            token: token
-        }));
+        socket.send(JSON.stringify({ action: 'logout', token: token }));
     });
 }
 
 if (perfilBtn) {
     perfilBtn.addEventListener('click', () => {
-        socket.send(JSON.stringify({
-            action: 'perfil',
-            token: token
-        }));
+        socket.send(JSON.stringify({ action: 'perfil', token: token }));
     });
 }
 
@@ -506,56 +293,34 @@ if (cerrarPerfilBtn) {
 
 if (nuevoBancoBtn) {
     nuevoBancoBtn.addEventListener('click', () => {
-        if (modalTitulo) modalTitulo.textContent = 'Nuevo Banco';
-        if (bancoForm) bancoForm.reset();
-        if (codigoInput) codigoInput.value = '';
-        if (bancoModal) bancoModal.style.display = 'block';
-    });
-}
-
-// Nuevo event listener para cajeros
-if (nuevoCajeroBtn) {
-    nuevoCajeroBtn.addEventListener('click', () => {
-        if (modalTitulo) modalTitulo.textContent = 'Nuevo Cajero';
-        if (cajeroForm) cajeroForm.reset();
-        if (idInput) idInput.value = '';
-        if (cajeroModal) cajeroModal.style.display = 'block';
+        modalTitulo.textContent = 'Nuevo Banco';
+        bancoForm.reset();
+        codigoInput.value = '';
+        bancoModal.style.display = 'block';
     });
 }
 
 if (cancelarBtn) {
     cancelarBtn.addEventListener('click', () => {
-        if (bancoModal) bancoModal.style.display = 'none';
+        bancoModal.style.display = 'none';
     });
 }
-
-if (cancelarBtn2) {
-    cancelarBtn2.addEventListener('click', () => {
-        if (cajeroModal) cajeroModal.style.display = 'none';
-    });
-}
-
 
 if (bancoForm) {
     bancoForm.addEventListener('submit', function (e) {
         e.preventDefault();
-
         const codigo = codigoInput?.value;
         const nombre = nombreInput?.value.trim();
         const cod_transaccion = codTransaccionInput?.value.trim();
-
         if (!nombre || !cod_transaccion) {
             mostrarAviso('Por favor complete todos los campos');
             return;
         }
-
         if (cod_transaccion.length !== 4) {
             mostrarAviso('El código de transacción debe tener 4 caracteres');
             return;
         }
-
         const action = codigo ? 'actualizar' : 'crear';
-
         socket.send(JSON.stringify({
             action: action,
             codigo: codigo || null,
@@ -563,48 +328,10 @@ if (bancoForm) {
             cod_transaccion: cod_transaccion,
             token: token
         }));
-
-        if (bancoModal) bancoModal.style.display = 'none';
+        bancoModal.style.display = 'none';
     });
 }
 
-if (cajeroForm) {
-    cajeroForm.addEventListener('submit', function (e) {
-        e.preventDefault();
-
-        const id = idInput?.value;
-        const nombre = nombreInput2?.value.trim();
-        const cod_banco = codBancoInput?.value.trim();
-        const puesto = puestoInput?.value.trim();
-        const ranking = rankingInput?.value.trim();
-
-        if (!nombre || !cod_banco || !puesto) {
-            mostrarAviso('Por favor complete todos los campos');
-            return;
-        }
-
-        if (ranking.length !== 1 || ranking > 5) {
-            mostrarAviso('El Ranking de transacción debe tener 1 caracter de (1-5)');
-            return;
-        }
-
-        const action = id ? 'actualizar' : 'crear';
-
-        socket.send(JSON.stringify({
-            action: action,
-            id: id || null,
-            nombre: nombre,
-            cod_banco: cod_banco,
-            puesto: puesto,
-            ranking: ranking,
-            token: token
-        }));
-
-        if (cajeroModal) cajeroModal.style.display = 'none';
-    });
-}
-
-// Event listeners para el perfil
 if (editarPerfilBtn) {
     editarPerfilBtn.addEventListener('click', habilitarEdicionPerfil);
 }
@@ -614,12 +341,10 @@ if (guardarPerfilBtn) {
         const nuevoNombre = editNombre?.value;
         const nuevoEmail = editEmail?.value;
         const nuevoRol = usuarioActual?.rol === 'admin' ? editRol?.value : usuarioActual?.rol;
-
         if (!nuevoNombre || !nuevoEmail) {
             mostrarAviso('Nombre y email son requeridos');
             return;
         }
-
         socket.send(JSON.stringify({
             action: 'actualizarPerfil',
             token: token,
@@ -636,20 +361,16 @@ if (cancelarEdicionBtn) {
 
 if (cambiarPasswordBtn) {
     cambiarPasswordBtn.addEventListener('click', function () {
-        if (passwordContainer) passwordContainer.style.display = 'block';
-        if (currentPassword) currentPassword.value = '';
-        if (newPassword) newPassword.value = '';
-        if (confirmPassword) confirmPassword.value = '';
+        passwordContainer.style.display = 'block';
+        currentPassword.value = '';
+        newPassword.value = '';
+        confirmPassword.value = '';
     });
 }
 
-// Cerrar modales al hacer clic fuera de ellos
 window.addEventListener('click', (event) => {
     if (bancoModal && event.target === bancoModal) {
         bancoModal.style.display = 'none';
-    }
-    if (cajeroModal && event.target === cajeroModal) {
-        cajeroModal.style.display = 'none';
     }
     if (perfilModal && event.target === perfilModal) {
         perfilModal.style.display = 'none';
@@ -657,7 +378,6 @@ window.addEventListener('click', (event) => {
     }
 });
 
-// Inicializar interfaz al cargar la página
 document.addEventListener('DOMContentLoaded', () => {
     actualizarInterfaz();
 });

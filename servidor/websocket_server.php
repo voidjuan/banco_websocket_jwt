@@ -17,7 +17,7 @@ class BancoWebSocket implements MessageComponentInterface
     protected $clients;
     protected $usuariosConectados;
     private $secretKey = 'tu_clave_secreta_super_segura_!@#$%^&*()';
-    private $tokenExpiration = 86400; // 24 horas en segundos
+    private $tokenExpiration = 86400;
 
     public function __construct()
     {
@@ -40,7 +40,6 @@ class BancoWebSocket implements MessageComponentInterface
     public function onMessage(ConnectionInterface $from, $msg)
     {
         try {
-            // Validar tamaño del mensaje
             if (strlen($msg) > 2048) {
                 throw new Exception('Mensaje demasiado largo');
             }
@@ -61,55 +60,42 @@ class BancoWebSocket implements MessageComponentInterface
                 case 'login':
                     $this->handleLogin($from, $data, $response);
                     break;
-
                 case 'logout':
                     $this->handleLogout($from, $response);
                     break;
-
                 case 'perfil':
                     $this->handlePerfil($from, $response);
                     break;
-
                 case 'listar':
                     $this->handleListar($from, $response);
                     break;
-
                 case 'crear':
                     $this->handleCrear($from, $data, $response);
                     break;
-
                 case 'actualizar':
                     $this->handleActualizar($from, $data, $response);
                     break;
-
                 case 'eliminar':
                     $this->handleEliminar($from, $data, $response);
                     break;
-
                 case 'consultar':
                     $this->handleConsultar($from, $data, $response);
                     break;
-
                 case 'listarCajeros':
                     $this->handleListarCajeros($from, $response);
                     break;
-
                 case 'crearCajero':
                     $this->handleCrearCajero($from, $data, $response);
                     break;
-
                 case 'actualizarCajero':
                     $this->handleActualizarCajero($from, $data, $response);
                     break;
-
                 case 'eliminarCajero':
                     $this->handleEliminarCajero($from, $data, $response);
                     break;
-
                 case 'consultarCajero':
                     $this->handleConsultarCajero($from, $data, $response);
                     break;
-
                 default:
                     throw new Exception('Acción no reconocida');
             }
@@ -201,7 +187,7 @@ class BancoWebSocket implements MessageComponentInterface
 
     private function handleListar(ConnectionInterface $conn, array &$response)
     {
-        $this->verificarPermiso($conn, 'lector');
+        $this->verificarAutenticacion($conn);
         $banco = new banco();
         $response['data'] = $banco->listar();
     }
@@ -209,66 +195,65 @@ class BancoWebSocket implements MessageComponentInterface
     private function handleCrear(ConnectionInterface $conn, array $data, array &$response)
     {
         $this->verificarPermiso($conn, 'editor');
-
         if (!isset($data['nombre']) || !isset($data['cod_transaccion'])) {
-            throw new Exception('Nombre y código de transacción son requeridos');
+            throw new Exception('Todos los campos son requeridos');
         }
-
         $banco = new banco();
         $banco->setNombre(trim($data['nombre']));
-        $banco->setCod_transaccion(trim($data['cod_transaccion']));
-        $banco->insertar();
-
-        $this->notificarTodos('actualizacion');
+        $banco->setCod_transaccion($data['cod_transaccion']);
+        $result = $banco->insertar();
+        if (!$result) {
+            throw new Exception('Error al crear el banco');
+        }
+        $this->notificarTodos('actualizacionBancos');
         $response['message'] = 'Banco creado exitosamente';
     }
 
     private function handleActualizar(ConnectionInterface $conn, array $data, array &$response)
     {
         $this->verificarPermiso($conn, 'editor');
-
         if (!isset($data['codigo']) || !isset($data['nombre']) || !isset($data['cod_transaccion'])) {
             throw new Exception('Todos los campos son requeridos');
         }
-
         $banco = new banco();
         $banco->setCodigo($data['codigo']);
         $banco->setNombre(trim($data['nombre']));
-        $banco->setCod_transaccion(trim($data['cod_transaccion']));
-        $banco->actualizar();
-
-        $this->notificarTodos('actualizacion');
+        $banco->setCod_transaccion($data['cod_transaccion']);
+        $result = $banco->actualizar();
+        if (!$result) {
+            throw new Exception('Error al actualizar el banco');
+        }
+        $this->notificarTodos('actualizacionBancos');
         $response['message'] = 'Banco actualizado exitosamente';
     }
 
     private function handleEliminar(ConnectionInterface $conn, array $data, array &$response)
     {
         $this->verificarPermiso($conn, 'admin');
-
         if (!isset($data['codigo'])) {
-            throw new Exception('Código de banco es requerido');
+            throw new Exception('Código del banco es requerido');
         }
-
         $banco = new banco();
         $banco->setCodigo($data['codigo']);
-        $banco->eliminar();
-
-        $this->notificarTodos('actualizacion');
+        $result = $banco->eliminar();
+        if (!$result) {
+            throw new Exception('Error al eliminar el banco');
+        }
+        $this->notificarTodos('actualizacionBancos');
         $response['message'] = 'Banco eliminado exitosamente';
     }
 
     private function handleConsultar(ConnectionInterface $conn, array $data, array &$response)
     {
         $this->verificarPermiso($conn, 'lector');
-
         if (!isset($data['codigo'])) {
-            throw new Exception('Código de banco es requerido');
+            throw new Exception('Código del banco es requerido');
         }
-
         $banco = new banco();
         $banco->setCodigo($data['codigo']);
-        $banco->consultar();
-
+        if (!$banco->consultar()) {
+            throw new Exception('Banco no encontrado');
+        }
         $response['data'] = [
             'codigo' => $banco->getCodigo(),
             'nombre' => $banco->getNombre(),
@@ -278,107 +263,83 @@ class BancoWebSocket implements MessageComponentInterface
 
     private function handleListarCajeros(ConnectionInterface $conn, array &$response)
     {
-        $this->verificarPermiso($conn, 'lector');
+        $this->verificarAutenticacion($conn);
         $cajero = new cajero();
         $response['data'] = $cajero->listar();
     }
-    
+
     private function handleCrearCajero(ConnectionInterface $conn, array $data, array &$response)
     {
         $this->verificarPermiso($conn, 'editor');
-    
         if (!isset($data['nombre']) || !isset($data['cod_banco']) || !isset($data['puesto']) || !isset($data['ranking'])) {
             throw new Exception('Todos los campos son requeridos');
         }
-    
         $cajero = new cajero();
-        
-        // Validar que el banco existe
         if (!$cajero->validarBanco($data['cod_banco'])) {
             throw new Exception('El banco especificado no existe');
         }
-    
         $cajero->setNombre(trim($data['nombre']));
         $cajero->setCod_banco($data['cod_banco']);
         $cajero->setPuesto(trim($data['puesto']));
         $cajero->setRanking($data['ranking']);
-        
         $result = $cajero->insertar();
-        
         if (!$result) {
             throw new Exception('Error al crear el cajero');
         }
-    
         $this->notificarTodos('actualizacionCajeros');
         $response['message'] = 'Cajero creado exitosamente';
     }
-    
+
     private function handleActualizarCajero(ConnectionInterface $conn, array $data, array &$response)
     {
         $this->verificarPermiso($conn, 'editor');
-    
         if (!isset($data['id']) || !isset($data['nombre']) || !isset($data['cod_banco']) || !isset($data['puesto']) || !isset($data['ranking'])) {
             throw new Exception('Todos los campos son requeridos');
         }
-    
         $cajero = new cajero();
-        
-        // Validar que el banco exists
         if (!$cajero->validarBanco($data['cod_banco'])) {
             throw new Exception('El banco especificado no existe');
         }
-    
         $cajero->setId($data['id']);
         $cajero->setNombre(trim($data['nombre']));
         $cajero->setCod_banco($data['cod_banco']);
         $cajero->setPuesto(trim($data['puesto']));
         $cajero->setRanking($data['ranking']);
-        
         $result = $cajero->actualizar();
-        
         if (!$result) {
             throw new Exception('Error al actualizar el cajero');
         }
-    
         $this->notificarTodos('actualizacionCajeros');
         $response['message'] = 'Cajero actualizado exitosamente';
     }
-    
+
     private function handleEliminarCajero(ConnectionInterface $conn, array $data, array &$response)
     {
         $this->verificarPermiso($conn, 'admin');
-    
         if (!isset($data['id'])) {
             throw new Exception('ID del cajero es requerido');
         }
-    
         $cajero = new cajero();
         $cajero->setId($data['id']);
         $result = $cajero->eliminar();
-        
         if (!$result) {
             throw new Exception('Error al eliminar el cajero');
         }
-    
         $this->notificarTodos('actualizacionCajeros');
         $response['message'] = 'Cajero eliminado exitosamente';
     }
-    
+
     private function handleConsultarCajero(ConnectionInterface $conn, array $data, array &$response)
     {
         $this->verificarPermiso($conn, 'lector');
-    
         if (!isset($data['id'])) {
             throw new Exception('ID del cajero es requerido');
         }
-    
         $cajero = new cajero();
         $cajero->setId($data['id']);
-        
         if (!$cajero->consultar()) {
             throw new Exception('Cajero no encontrado');
         }
-    
         $response['data'] = [
             'id' => $cajero->getId(),
             'nombre' => $cajero->getNombre(),
@@ -387,7 +348,7 @@ class BancoWebSocket implements MessageComponentInterface
             'ranking' => $cajero->getRanking()
         ];
     }
-    
+
     public function onClose(ConnectionInterface $conn)
     {
         if (isset($this->usuariosConectados[$conn->resourceId])) {
@@ -429,7 +390,6 @@ class BancoWebSocket implements MessageComponentInterface
             'username' => $usuario->getUsername(),
             'rol' => $usuario->getRol()
         ];
-
         return JWT::encode($payload, $this->secretKey, 'HS256');
     }
 
@@ -438,37 +398,30 @@ class BancoWebSocket implements MessageComponentInterface
         if (!isset($this->usuariosConectados[$conn->resourceId]['autenticado'])) {
             throw new Exception('No autenticado');
         }
-
         if (!$this->usuariosConectados[$conn->resourceId]['autenticado']) {
             throw new Exception('Sesión no válida');
         }
-
         return $this->usuariosConectados[$conn->resourceId]['usuario'];
     }
 
     private function verificarPermiso(ConnectionInterface $conn, $rolRequerido)
     {
         $usuario = $this->verificarAutenticacion($conn);
-
         $jerarquiaRoles = [
             'lector' => 1,
             'editor' => 2,
             'admin' => 3
         ];
-
         if (!isset($jerarquiaRoles[$usuario->getRol()])) {
             throw new Exception('Rol de usuario no válido');
         }
-
         if ($jerarquiaRoles[$usuario->getRol()] < $jerarquiaRoles[$rolRequerido]) {
             throw new Exception('Permisos insuficientes');
         }
-
         return true;
     }
 }
 
-// Configuración del servidor
 $port = 8080;
 $server = IoServer::factory(
     new HttpServer(
