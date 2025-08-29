@@ -2,146 +2,658 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema de Gestión Bancaria</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        .section { margin-bottom: 20px; }
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
-        .modal-content { background: white; margin: 15% auto; padding: 20px; width: 50%; }
-        table { width: 100%; border-collapse: collapse; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-        th { background-color: #f2f2f2; }
-        button { margin-right: 5px; }
-        #avisoError { padding: 10px; margin-bottom: 10px; display: none; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --danger-color: #e74c3c;
+            --warning-color: #f39c12;
+            --light-bg: #ecf0f1;
+            --dark-text: #2c3e50;
+            --border-radius: 8px;
+            --box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            --transition: all 0.3s ease;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--dark-text);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Login Section */
+        #loginSection {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 40px;
+            max-width: 400px;
+            margin: 100px auto;
+            box-shadow: var(--box-shadow);
+            animation: fadeIn 0.5s ease;
+        }
+
+        #loginSection h2 {
+            color: var(--primary-color);
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 28px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--dark-text);
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: var(--border-radius);
+            font-size: 14px;
+            transition: var(--transition);
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        /* Buttons */
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: var(--secondary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+        }
+
+        .btn-success {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #229954;
+        }
+
+        .btn-danger {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+
+        .btn-warning {
+            background: var(--warning-color);
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #e67e22;
+        }
+
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #7f8c8d;
+        }
+
+        /* Main Section */
+        #mainSection {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 30px;
+            box-shadow: var(--box-shadow);
+            animation: slideUp 0.5s ease;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-radius: var(--border-radius);
+            margin-bottom: 30px;
+            box-shadow: var(--box-shadow);
+        }
+
+        .header h1 {
+            font-size: 24px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-badge {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            backdrop-filter: blur(10px);
+        }
+
+        /* Tables Section */
+        .table-section {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .table-header h2 {
+            color: var(--primary-color);
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .table-icon {
+            width: 30px;
+            height: 30px;
+            background: var(--secondary-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 16px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            overflow: hidden;
+            border-radius: var(--border-radius);
+        }
+
+        thead {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        tbody tr {
+            transition: var(--transition);
+        }
+
+        tbody tr:hover {
+            background: #f8f9fa;
+            transform: scale(1.01);
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+        }
+
+        .action-buttons button {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        /* Modals */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            background: white;
+            max-width: 500px;
+            margin: 50px auto;
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            animation: slideDown 0.3s ease;
+        }
+
+        .modal-content h2 {
+            color: var(--primary-color);
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--light-bg);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid var(--light-bg);
+        }
+
+        /* Alerts */
+        #avisoError {
+            padding: 15px 20px;
+            border-radius: var(--border-radius);
+            margin-bottom: 20px;
+            display: none;
+            animation: slideDown 0.3s ease;
+            font-weight: 500;
+            box-shadow: var(--box-shadow);
+        }
+
+        #avisoError.error {
+            background: #fee;
+            color: var(--danger-color);
+            border-left: 4px solid var(--danger-color);
+        }
+
+        #avisoError.success {
+            background: #e8f8f5;
+            color: var(--success-color);
+            border-left: 4px solid var(--success-color);
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { 
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideDown {
+            from { 
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Role badges */
+        .role-admin {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .role-editor {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .role-lector {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+
+            .table-header {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            table {
+                font-size: 14px;
+            }
+
+            th, td {
+                padding: 10px;
+            }
+        }
+
+        /* Loading indicator */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #95a5a6;
+        }
+
+        .empty-state svg {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
     </style>
 </head>
 <body>
-    <div id="avisoError"></div>
+    <div class="container">
+        <div id="avisoError"></div>
 
-    <div id="loginSection" class="section">
-        <h2>Iniciar Sesión</h2>
-        <div>
-            <label>Usuario: <input type="text" id="username"></label>
-        </div>
-        <div>
-            <label>Contraseña: <input type="password" id="password"></label>
-        </div>
-        <button id="loginBtn">Ingresar</button>
-    </div>
-
-    <div id="mainSection" class="section" style="display: none;">
-        <div id="perfilInfo"></div>
-        <button id="perfilBtn">Mi Perfil</button>
-        <button id="logoutBtn">Cerrar Sesión</button>
-
-        <h2>Listado de Bancos</h2>
-        <button id="nuevoBanco">Crear Nuevo Banco</button>
-        <table>
-            <thead>
-                <tr>
-                    <th>Código</th>
-                    <th>Nombre</th>
-                    <th>Código Transacción</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody id="cuerpoTabla"></tbody>
-        </table>
-
-        <h2>Listado de Cajeros</h2>
-        <button id="nuevoCajero">Crear Nuevo Cajero</button>
-        <table>
-            <thead>
-                <tr>
-                    <th>Id</th>
-                    <th>Nombre</th>
-                    <th>Cod_Banco</th>
-                    <th>Puesto</th>
-                    <th>Ranking</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody id="cuerpoTabla2"></tbody>
-        </table>
-    </div>
-
-    <div id="bancoModal" class="modal">
-        <div class="modal-content">
-            <h2 id="modalTitulo">Nuevo Banco</h2>
-            <form id="bancoForm">
-                <input type="hidden" id="codigo">
-                <div>
-                    <label>Nombre: <input type="text" id="nombre"></label>
+        <!-- Login Section -->
+        <div id="loginSection">
+            <h2>🏦 Sistema Bancario</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="username">Usuario</label>
+                    <input type="text" id="username" placeholder="Ingrese su usuario" autocomplete="username">
                 </div>
-                <div>
-                    <label>Código Transacción: <input type="text" id="cod_transaccion"></label>
+                <div class="form-group">
+                    <label for="password">Contraseña</label>
+                    <input type="password" id="password" placeholder="Ingrese su contraseña" autocomplete="current-password">
                 </div>
-                <button type="submit">Guardar</button>
-                <button type="reset">Limpiar</button>
-                <button type="button" id="cancelar">Cancelar</button>
+                <button type="submit" class="btn-primary" style="width: 100%;" id="loginBtn">
+                    Iniciar Sesión
+                </button>
             </form>
         </div>
-    </div>
 
-    <div id="cajeroModal" class="modal">
-        <div class="modal-content">
-            <h2 id="modalTitulo2">Nuevo Cajero</h2>
-            <form id="cajeroForm">
-                <input type="hidden" id="id">
-                <div>
-                    <label>Nombre: <input type="text" id="nombre2"></label>
+        <!-- Main Section -->
+        <div id="mainSection" style="display: none;">
+            <div class="header">
+                <h1>🏦 Sistema de Gestión Bancaria</h1>
+                <div class="user-info">
+                    <div id="perfilInfo"></div>
+                    <button id="perfilBtn" class="btn-secondary">Mi Perfil</button>
+                    <button id="logoutBtn" class="btn-danger">Cerrar Sesión</button>
                 </div>
-                <div>
-                    <label>Código Banco: <input type="text" id="cod_banco"></label>
+            </div>
+
+            <!-- Bancos Table -->
+            <div class="table-section">
+                <div class="table-header">
+                    <h2>
+                        <span class="table-icon">🏛️</span>
+                        Listado de Bancos
+                    </h2>
+                    <button id="nuevoBanco" class="btn-success" style="display: none;">
+                        + Nuevo Banco
+                    </button>
                 </div>
-                <div>
-                    <label>Puesto: <input type="text" id="puesto"></label>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Código</th>
+                            <th>Nombre</th>
+                            <th>Código Transacción</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cuerpoTabla">
+                        <tr>
+                            <td colspan="4" class="empty-state">
+                                <p>Cargando datos...</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Cajeros Table -->
+            <div class="table-section">
+                <div class="table-header">
+                    <h2>
+                        <span class="table-icon">👥</span>
+                        Listado de Cajeros
+                    </h2>
+                    <button id="nuevoCajero" class="btn-success" style="display: none;">
+                        + Nuevo Cajero
+                    </button>
                 </div>
-                <div>
-                    <label>Ranking: <input type="text" id="ranking"></label>
-                </div>
-                <button type="submit">Guardar</button>
-                <button type="reset">Limpiar</button>
-                <button type="button" id="cancelar2">Cancelar</button>
-            </form>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Banco</th>
+                            <th>Puesto</th>
+                            <th>Ranking</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cuerpoTabla2">
+                        <tr>
+                            <td colspan="6" class="empty-state">
+                                <p>Cargando datos...</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
-    </div>
 
-    <div id="perfilModal" class="modal">
-        <div class="modal-content">
-            <h2>Mi Perfil</h2>
-            <div>
-                <label>Nombre: <input type="text" id="editNombre" style="display: none;"></label>
+        <!-- Modal Banco -->
+        <div id="bancoModal" class="modal">
+            <div class="modal-content">
+                <h2 id="modalTitulo">Nuevo Banco</h2>
+                <form id="bancoForm">
+                    <input type="hidden" id="codigo">
+                    <div class="form-group">
+                        <label for="nombre">Nombre del Banco</label>
+                        <input type="text" id="nombre" placeholder="Ej: Banco Nacional" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="cod_transaccion">Código de Transacción</label>
+                        <input type="text" id="cod_transaccion" placeholder="Ej: BN01" maxlength="4" required>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" id="cancelar" class="btn-secondary">Cancelar</button>
+                        <button type="reset" class="btn-warning">Limpiar</button>
+                        <button type="submit" class="btn-primary">Guardar</button>
+                    </div>
+                </form>
             </div>
-            <div>
-                <label>Usuario: <span id="viewUsername"></span></label>
+        </div>
+
+        <!-- Modal Cajero -->
+        <div id="cajeroModal" class="modal">
+            <div class="modal-content">
+                <h2 id="modalTitulo2">Nuevo Cajero</h2>
+                <form id="cajeroForm">
+                    <input type="hidden" id="id">
+                    <div class="form-group">
+                        <label for="nombre2">Nombre del Cajero</label>
+                        <input type="text" id="nombre2" placeholder="Nombre completo" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="cod_banco">Código del Banco</label>
+                        <input type="number" id="cod_banco" placeholder="Código del banco" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="puesto">Puesto</label>
+                        <input type="text" id="puesto" placeholder="Ej: Atención al Cliente" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="ranking">Ranking (1-5)</label>
+                        <select id="ranking" required>
+                            <option value="">Seleccione...</option>
+                            <option value="1">1 - Básico</option>
+                            <option value="2">2 - Regular</option>
+                            <option value="3">3 - Bueno</option>
+                            <option value="4">4 - Muy Bueno</option>
+                            <option value="5">5 - Excelente</option>
+                        </select>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" id="cancelar2" class="btn-secondary">Cancelar</button>
+                        <button type="reset" class="btn-warning">Limpiar</button>
+                        <button type="submit" class="btn-primary">Guardar</button>
+                    </div>
+                </form>
             </div>
-            <div>
-                <label>Email: <input type="email" id="editEmail" style="display: none;"></label>
-            </div>
-            <div>
-                <label>Rol: <span id="viewRol"></span>
+        </div>
+
+        <!-- Modal Perfil -->
+        <div id="perfilModal" class="modal">
+            <div class="modal-content">
+                <h2>Mi Perfil</h2>
+                <div class="form-group">
+                    <label>Nombre</label>
+                    <div id="viewNombre" class="form-control-static"></div>
+                    <input type="text" id="editNombre" style="display: none;">
+                </div>
+                <div class="form-group">
+                    <label>Usuario</label>
+                    <div id="viewUsername" class="form-control-static"></div>
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <div id="viewEmail" class="form-control-static"></div>
+                    <input type="email" id="editEmail" style="display: none;">
+                </div>
+                <div class="form-group">
+                    <label>Rol</label>
+                    <div id="viewRol" class="form-control-static"></div>
                     <select id="editRol" style="display: none;">
                         <option value="lector">Lector</option>
                         <option value="editor">Editor</option>
                         <option value="admin">Administrador</option>
                     </select>
-                </label>
+                </div>
+                <div id="passwordContainer" style="display: none;">
+                    <div class="form-group">
+                        <label>Contraseña Actual</label>
+                        <input type="password" id="currentPassword">
+                    </div>
+                    <div class="form-group">
+                        <label>Nueva Contraseña</label>
+                        <input type="password" id="newPassword">
+                    </div>
+                    <div class="form-group">
+                        <label>Confirmar Nueva Contraseña</label>
+                        <input type="password" id="confirmPassword">
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button id="cerrarPerfil" class="btn-secondary">Cerrar</button>
+                    <button id="cambiarPasswordBtn" class="btn-warning">Cambiar Contraseña</button>
+                    <button id="editarPerfilBtn" class="btn-primary">Editar Perfil</button>
+                    <button id="guardarPerfilBtn" class="btn-success" style="display: none;">Guardar Cambios</button>
+                    <button id="cancelarEdicionBtn" class="btn-secondary" style="display: none;">Cancelar</button>
+                </div>
             </div>
-            <div id="passwordContainer" style="display: none;">
-                <label>Contraseña Actual: <input type="password" id="currentPassword"></label>
-                <label>Nueva Contraseña: <input type="password" id="newPassword"></label>
-                <label>Confirmar Nueva Contraseña: <input type="password" id="confirmPassword"></label>
-            </div>
-            <button id="editarPerfilBtn">Editar Perfil</button>
-            <button id="cambiarPasswordBtn">Cambiar Contraseña</button>
-            <button id="guardarPerfilBtn" style="display: none;">Guardar Cambios</button>
-            <button id="cancelarEdicionBtn" style="display: none;">Cancelar</button>
-            <button id="cerrarPerfil">Cerrar</button>
         </div>
     </div>
 
-    <script src="banco.js"></script>
-    <script src="cajero.js"></script>
+    <script src="js/banco.js"></script>
+    <script src="js/cajero.js"></script>
 </body>
 </html>
