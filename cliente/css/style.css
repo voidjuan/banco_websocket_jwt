@@ -240,34 +240,104 @@ tr:last-child td {
 
 /* Botones en tablas */
 td .btn {
-  padding: 6px 12px;
-  margin: 2px;
-  font-size: clamp(0.7rem, 1.8vw, 0.8rem);
-  border-radius: 6px;
-  min-height: 32px;
+  padding: 8px 16px;
+  margin: 3px;
+  font-size: clamp(0.7rem, 1.8vw, 0.85rem);
+  border-radius: 8px;
+  min-height: 36px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  border: 2px solid transparent;
 }
 
-/* Contenedor de acciones en tabla */
+/* Efecto de brillo en botones CRUD */
+td .btn:before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.5s ease;
+}
+
+td .btn:hover:before {
+  left: 100%;
+}
+
+/* Botón Editar mejorado */
+td .btn[data-action="editar"],
+td button[onclick*="editar"] {
+  background: linear-gradient(135deg, #4878bb 0%, #3860a1 100%);
+  color: white;
+  border-color: #38a169;
+  box-shadow: 0 4px 12px rgba(72, 187, 120, 0.3);
+}
+
+td .btn[data-action="editar"]:hover,
+td button[onclick*="editar"]:hover {
+  background: linear-gradient(135deg, #3852a1 0%, #362f85 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(72, 187, 120, 0.4);
+  border-color: #2f855a;
+}
+
+/* Botón Eliminar mejorado */
+td .btn[data-action="eliminar"],
+td button[onclick*="eliminar"] {
+  background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+  color: white;
+  border-color: #e53e3e;
+  box-shadow: 0 4px 12px rgba(245, 101, 101, 0.3);
+}
+
+td .btn[data-action="eliminar"]:hover,
+td button[onclick*="eliminar"]:hover {
+  background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(245, 101, 101, 0.4);
+  border-color: #c53030;
+}
+
+/* Contenedor de acciones en tabla mejorado */
 .table-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
+  gap: 6px;
   justify-content: flex-start;
   align-items: center;
+  padding: 4px;
 }
 
-/* Mensajes de error/aviso */
-#avisoError {
-  color: #e53e3e;
+/* Mejorando el diseño general de las tablas */
+/* Mejoras adicionales para las celdas de acciones */
+td:last-child {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border-left: 2px solid #e2e8f0;
+}
+
+tr:hover td:last-child {
+  background: linear-gradient(135deg, #edf2f7 0%, #e2e8f0 100%);
+}
+
+/* Texto "Solo lectura" mejorado */
+td span[data-text="Solo lectura"],
+td span {
+  color: #718096;
   font-weight: 600;
-  display: none;
-  margin-bottom: 20px;
-  padding: 12px 16px;
-  background: #fed7d7;
-  border: 1px solid #feb2b2;
-  border-radius: 8px;
-  border-left: 4px solid #e53e3e;
-  font-size: clamp(0.8rem, 2.2vw, 0.9rem);
+  font-style: italic;
+  padding: 8px 16px;
+  background: linear-gradient(135deg, #edf2f7 0%, #e2e8f0 100%);
+  border-radius: 6px;
+  border: 1px solid #cbd5e0;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 /* Modales */
@@ -286,8 +356,12 @@ td .btn {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .modal-content {
@@ -459,57 +533,78 @@ td .btn {
     text-align: center;
     gap: 15px;
   }
-  
+
   .user-controls {
     justify-content: center;
     width: 100%;
   }
-  
+
   .toolbar {
     justify-content: center;
   }
-  
+
   .table-container {
     margin-left: -15px;
     margin-right: -15px;
     border-radius: 0;
   }
-  
+
   table {
     border-radius: 0;
     width: 100%;
     min-width: unset;
     table-layout: fixed;
   }
-  
-  th, td {
+
+  th,
+  td {
     word-wrap: break-word;
     overflow-wrap: break-word;
   }
-  
+
   /* Distribución específica de columnas para bancos */
   table#tablaBancos th:nth-child(1),
-  table#tablaBancos td:nth-child(1) { width: 15%; }
+  table#tablaBancos td:nth-child(1) {
+    width: 15%;
+  }
   table#tablaBancos th:nth-child(2),
-  table#tablaBancos td:nth-child(2) { width: 35%; }
+  table#tablaBancos td:nth-child(2) {
+    width: 35%;
+  }
   table#tablaBancos th:nth-child(3),
-  table#tablaBancos td:nth-child(3) { width: 25%; }
+  table#tablaBancos td:nth-child(3) {
+    width: 25%;
+  }
   table#tablaBancos th:nth-child(4),
-  table#tablaBancos td:nth-child(4) { width: 25%; }
-  
+  table#tablaBancos td:nth-child(4) {
+    width: 25%;
+  }
+
   /* Distribución específica de columnas para cajeros */
   table#tablaCajeros th:nth-child(1),
-  table#tablaCajeros td:nth-child(1) { width: 10%; }
+  table#tablaCajeros td:nth-child(1) {
+    width: 10%;
+  }
   table#tablaCajeros th:nth-child(2),
-  table#tablaCajeros td:nth-child(2) { width: 25%; }
+  table#tablaCajeros td:nth-child(2) {
+    width: 25%;
+  }
   table#tablaCajeros th:nth-child(3),
-  table#tablaCajeros td:nth-child(3) { width: 15%; }
+  table#tablaCajeros td:nth-child(3) {
+    width: 15%;
+  }
   table#tablaCajeros th:nth-child(4),
-  table#tablaCajeros td:nth-child(4) { width: 20%; }
+  table#tablaCajeros td:nth-child(4) {
+    width: 20%;
+  }
   table#tablaCajeros th:nth-child(5),
-  table#tablaCajeros td:nth-child(5) { width: 10%; }
+  table#tablaCajeros td:nth-child(5) {
+    width: 10%;
+  }
   table#tablaCajeros th:nth-child(6),
-  table#tablaCajeros td:nth-child(6) { width: 20%; }
+  table#tablaCajeros td:nth-child(6) {
+    width: 20%;
+  }
 }
 
 /* Móviles grandes */
@@ -517,109 +612,130 @@ td .btn {
   body {
     font-size: 14px;
   }
-  
+
   .header {
     padding: 15px;
     margin-bottom: 15px;
   }
-  
+
   .header h1 {
     font-size: 1.4rem;
   }
-  
+
   .user-info {
     font-size: 0.8rem;
     padding: 6px 10px;
   }
-  
+
   section {
     padding: 15px;
     margin-bottom: 15px;
   }
-  
+
   .table-container {
     margin: 0 -15px 20px -15px;
     box-shadow: none;
     width: calc(100% + 30px);
   }
-  
+
   table {
     width: 100%;
     min-width: unset;
     font-size: 0.8rem;
     table-layout: fixed;
   }
-  
-  th, td {
+
+  th,
+  td {
     padding: 8px 4px;
     white-space: normal;
     word-wrap: break-word;
     overflow-wrap: break-word;
   }
-  
+
   /* Distribución mejorada para móviles - tabla bancos */
   table#tablaBancos th:nth-child(1),
-  table#tablaBancos td:nth-child(1) { width: 12%; }
+  table#tablaBancos td:nth-child(1) {
+    width: 12%;
+  }
   table#tablaBancos th:nth-child(2),
-  table#tablaBancos td:nth-child(2) { width: 38%; }
+  table#tablaBancos td:nth-child(2) {
+    width: 38%;
+  }
   table#tablaBancos th:nth-child(3),
-  table#tablaBancos td:nth-child(3) { width: 22%; }
+  table#tablaBancos td:nth-child(3) {
+    width: 22%;
+  }
   table#tablaBancos th:nth-child(4),
-  table#tablaBancos td:nth-child(4) { width: 28%; }
-  
+  table#tablaBancos td:nth-child(4) {
+    width: 28%;
+  }
+
   /* Distribución mejorada para móviles - tabla cajeros */
   table#tablaCajeros th:nth-child(1),
-  table#tablaCajeros td:nth-child(1) { width: 8%; }
+  table#tablaCajeros td:nth-child(1) {
+    width: 8%;
+  }
   table#tablaCajeros th:nth-child(2),
-  table#tablaCajeros td:nth-child(2) { width: 22%; }
+  table#tablaCajeros td:nth-child(2) {
+    width: 22%;
+  }
   table#tablaCajeros th:nth-child(3),
-  table#tablaCajeros td:nth-child(3) { width: 12%; }
+  table#tablaCajeros td:nth-child(3) {
+    width: 12%;
+  }
   table#tablaCajeros th:nth-child(4),
-  table#tablaCajeros td:nth-child(4) { width: 22%; }
+  table#tablaCajeros td:nth-child(4) {
+    width: 22%;
+  }
   table#tablaCajeros th:nth-child(5),
-  table#tablaCajeros td:nth-child(5) { width: 10%; }
+  table#tablaCajeros td:nth-child(5) {
+    width: 10%;
+  }
   table#tablaCajeros th:nth-child(6),
-  table#tablaCajeros td:nth-child(6) { width: 26%; }
-  
+  table#tablaCajeros td:nth-child(6) {
+    width: 26%;
+  }
+
   td .btn {
-    padding: 3px 6px;
-    font-size: 0.65rem;
+    padding: 6px 12px;
+    font-size: 0.75rem;
     margin: 1px 0;
     min-height: 26px;
     display: block;
     width: 100%;
     text-align: center;
   }
-  
+
   .table-actions {
     gap: 2px;
     flex-direction: column;
     align-items: stretch;
   }
-  
+
   .modal-content {
     width: 98%;
     margin: 5% auto;
     max-height: 85vh;
   }
-  
+
   .form-actions,
   .modal-actions {
     flex-direction: column;
     gap: 8px;
   }
-  
+
   .btn {
     width: 100%;
     justify-content: center;
   }
-  
+
   .toolbar .btn {
     width: auto;
     flex: 1;
     min-width: 120px;
   }
-  
+
   .user-controls .btn {
     width: auto;
     flex: 1;
@@ -631,86 +747,110 @@ td .btn {
   #loginSection {
     padding: 15px;
   }
-  
+
   #loginForm {
     padding: 20px;
   }
-  
+
   #loginSection h1 {
     font-size: 1.6rem;
     margin-bottom: 20px;
   }
-  
+
   .header {
     padding: 12px;
   }
-  
+
   .header h1 {
     font-size: 1.2rem;
   }
-  
+
   section {
     padding: 12px;
   }
-  
+
   section h1 {
     font-size: 1.2rem;
     margin-bottom: 12px;
   }
-  
+
   .table-container {
     margin: 0 -12px 15px -12px;
     width: calc(100% + 24px);
   }
-  
+
   table {
     width: 100%;
     min-width: unset;
     font-size: 0.75rem;
     table-layout: fixed;
   }
-  
-  th, td {
+
+  th,
+  td {
     padding: 6px 2px;
     font-size: 0.75rem;
     word-wrap: break-word;
     overflow-wrap: break-word;
     white-space: normal;
   }
-  
+
   /* Ancho específico para tabla de bancos en móviles pequeños */
   table#tablaBancos th:nth-child(1),
-  table#tablaBancos td:nth-child(1) { width: 10%; font-size: 0.7rem; }
+  table#tablaBancos td:nth-child(1) {
+    width: 10%;
+    font-size: 0.7rem;
+  }
   table#tablaBancos th:nth-child(2),
-  table#tablaBancos td:nth-child(2) { width: 40%; }
+  table#tablaBancos td:nth-child(2) {
+    width: 40%;
+  }
   table#tablaBancos th:nth-child(3),
-  table#tablaBancos td:nth-child(3) { width: 20%; font-size: 0.7rem; }
+  table#tablaBancos td:nth-child(3) {
+    width: 20%;
+    font-size: 0.7rem;
+  }
   table#tablaBancos th:nth-child(4),
-  table#tablaBancos td:nth-child(4) { width: 30%; }
-  
+  table#tablaBancos td:nth-child(4) {
+    width: 30%;
+  }
+
   /* Ancho específico para tabla de cajeros en móviles pequeños */
   table#tablaCajeros th:nth-child(1),
-  table#tablaCajeros td:nth-child(1) { width: 7%; font-size: 0.7rem; }
-  table#tablaCajeros th:nth-child(2),
-  table#tablaCajeros td:nth-child(2) { width: 25%; }
-  table#tablaCajeros th:nth-child(3),
-  table#tablaCajeros td:nth-child(3) { width: 10%; font-size: 0.7rem; }
-  table#tablaCajeros th:nth-child(4),
-  table#tablaCajeros td:nth-child(4) { width: 23%; }
-  table#tablaCajeros th:nth-child(5),
-  table#tablaCajeros td:nth-child(5) { width: 8%; font-size: 0.7rem; }
-  table#tablaCajeros th:nth-child(6),
-  table#tablaCajeros td:nth-child(6) { width: 27%; }
-  
-  td .btn {
-    padding: 2px 4px;
-    font-size: 0.6rem;
-    min-height: 22px;
-    margin: 1px 0;
-    display: block;
-    width: 100%;
+  table#tablaCajeros td:nth-child(1) {
+    width: 7%;
+    font-size: 0.7rem;
   }
-  
+  table#tablaCajeros th:nth-child(2),
+  table#tablaCajeros td:nth-child(2) {
+    width: 25%;
+  }
+  table#tablaCajeros th:nth-child(3),
+  table#tablaCajeros td:nth-child(3) {
+    width: 10%;
+    font-size: 0.7rem;
+  }
+  table#tablaCajeros th:nth-child(4),
+  table#tablaCajeros td:nth-child(4) {
+    width: 23%;
+  }
+  table#tablaCajeros th:nth-child(5),
+  table#tablaCajeros td:nth-child(5) {
+    width: 8%;
+    font-size: 0.7rem;
+  }
+  table#tablaCajeros th:nth-child(6),
+  table#tablaCajeros td:nth-child(6) {
+    width: 27%;
+  }
+
+  td .btn {
+    padding: 4px 8px;
+    font-size: 0.7rem;
+    min-height: 28px;
+    margin: 1px 0;
+  }
+
   .modal-content {
     width: 100%;
     height: 100vh;
@@ -718,17 +858,17 @@ td .btn {
     border-radius: 0;
     max-height: 100vh;
   }
-  
+
   .user-info {
     font-size: 0.75rem;
     padding: 4px 8px;
     word-break: break-word;
   }
-  
+
   .toolbar {
     gap: 5px;
   }
-  
+
   .toolbar .btn {
     font-size: 0.7rem;
     padding: 6px 8px;
@@ -740,58 +880,81 @@ td .btn {
   body {
     font-size: 13px;
   }
-  
+
   .header h1 {
     font-size: 1.1rem;
   }
-  
+
   section h1 {
     font-size: 1.1rem;
   }
-  
+
   .table-container {
     width: calc(100% + 20px);
   }
-  
+
   table {
     width: 100%;
     min-width: unset;
     table-layout: fixed;
   }
-  
-  th, td {
+
+  th,
+  td {
     padding: 4px 1px;
     font-size: 0.65rem;
     word-wrap: break-word;
   }
-  
+
   /* Distribución ultra compacta para móviles muy pequeños */
   table#tablaBancos th:nth-child(1),
-  table#tablaBancos td:nth-child(1) { width: 8%; font-size: 0.6rem; }
-  table#tablaBancos th:nth-child(2),
-  table#tablaBancos td:nth-child(2) { width: 42%; font-size: 0.65rem; }
-  table#tablaBancos th:nth-child(3),
-  table#tablaBancos td:nth-child(3) { width: 18%; font-size: 0.6rem; }
-  table#tablaBancos th:nth-child(4),
-  table#tablaBancos td:nth-child(4) { width: 32%; }
-  
-  table#tablaCajeros th:nth-child(1),
-  table#tablaCajeros td:nth-child(1) { width: 6%; font-size: 0.6rem; }
-  table#tablaCajeros th:nth-child(2),
-  table#tablaCajeros td:nth-child(2) { width: 26%; }
-  table#tablaCajeros th:nth-child(3),
-  table#tablaCajeros td:nth-child(3) { width: 8%; font-size: 0.6rem; }
-  table#tablaCajeros th:nth-child(4),
-  table#tablaCajeros td:nth-child(4) { width: 24%; }
-  table#tablaCajeros th:nth-child(5),
-  table#tablaCajeros td:nth-child(5) { width: 7%; font-size: 0.6rem; }
-  table#tablaCajeros th:nth-child(6),
-  table#tablaCajeros td:nth-child(6) { width: 29%; }
-  
-  .user-info {
-    font-size: 0.7rem;
+  table#tablaBancos td:nth-child(1) {
+    width: 8%;
+    font-size: 0.6rem;
   }
-  
+  table#tablaBancos th:nth-child(2),
+  table#tablaBancos td:nth-child(2) {
+    width: 42%;
+    font-size: 0.65rem;
+  }
+  table#tablaBancos th:nth-child(3),
+  table#tablaBancos td:nth-child(3) {
+    width: 18%;
+    font-size: 0.6rem;
+  }
+  table#tablaBancos th:nth-child(4),
+  table#tablaBancos td:nth-child(4) {
+    width: 32%;
+  }
+
+  table#tablaCajeros th:nth-child(1),
+  table#tablaCajeros td:nth-child(1) {
+    width: 6%;
+    font-size: 0.6rem;
+  }
+  table#tablaCajeros th:nth-child(2),
+  table#tablaCajeros td:nth-child(2) {
+    width: 26%;
+  }
+  table#tablaCajeros th:nth-child(3),
+  table#tablaCajeros td:nth-child(3) {
+    width: 8%;
+    font-size: 0.6rem;
+  }
+  table#tablaCajeros th:nth-child(4),
+  table#tablaCajeros td:nth-child(4) {
+    width: 24%;
+  }
+  table#tablaCajeros th:nth-child(5),
+  table#tablaCajeros td:nth-child(5) {
+    width: 7%;
+    font-size: 0.6rem;
+  }
+  table#tablaCajeros th:nth-child(6),
+  table#tablaCajeros td:nth-child(6) {
+    width: 29%;
+  }
+
   td .btn {
     padding: 1px 2px;
     font-size: 0.55rem;
@@ -806,12 +969,12 @@ td .btn {
     height: 95vh;
     margin: 1% auto;
   }
-  
+
   #loginSection h1 {
     font-size: 1.4rem;
     margin-bottom: 15px;
   }
-  
+
   #loginForm {
     padding: 20px;
   }
@@ -823,12 +986,12 @@ td .btn {
     min-height: 44px;
     min-width: 44px;
   }
-  
+
   td .btn {
     min-height: 36px;
     min-width: 36px;
   }
-  
+
   .form-group input,
   .form-group select {
     min-height: 44px;
@@ -842,12 +1005,167 @@ td .btn {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
-  
+
   .btn:hover {
     transform: none;
   }
-  
+
   tr:hover {
     transform: none;
+  }
+}
+
+/* Botón hamburguesa */
+.menu-btn {
+  font-size: 24px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  cursor: pointer;
+  margin-right: 15px;
+  display: block;
+  color: white;
+  padding: 12px 16px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  transition: all 0.3s ease;
+  font-weight: bold;
+  min-width: 50px;
+  min-height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.menu-btn:hover {
+  background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.menu-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+/* Menú de navegación */
+.menu-nav {
+  display: none;
+  position: absolute;
+  top: 70px;
+  left: 15px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  border: 1px solid #e2e8f0;
+  backdrop-filter: blur(10px);
+  z-index: 1000;
+  min-width: 200px;
+  overflow: hidden;
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.menu-nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.menu-nav li {
+  margin: 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.menu-nav li:last-child {
+  border-bottom: none;
+}
+
+.menu-nav a {
+  text-decoration: none;
+  color: #2d3748;
+  font-weight: 600;
+  display: block;
+  padding: 16px 20px;
+  transition: all 0.3s ease;
+  font-size: 0.95rem;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  position: relative;
+  overflow: hidden;
+}
+
+.menu-nav a:hover {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  transform: translateX(5px);
+  padding-left: 25px;
+}
+
+.menu-nav a:before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 4px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  transform: scaleY(0);
+  transition: transform 0.3s ease;
+}
+
+.menu-nav a:hover:before {
+  transform: scaleY(1);
+}
+
+/* Responsive: mostrar botón en móviles */
+@media (max-width: 768px) {
+  .menu-btn {
+    display: block;
+    font-size: 20px;
+    padding: 10px 14px;
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .menu-nav {
+    left: 10px;
+    right: 10px;
+    width: auto;
+    min-width: auto;
+    top: 65px;
+  }
+
+  .menu-nav a {
+    padding: 14px 18px;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .menu-btn {
+    font-size: 18px;
+    padding: 8px 12px;
+    margin-right: 10px;
+  }
+
+  .menu-nav {
+    left: 5px;
+    right: 5px;
+    top: 60px;
+  }
+
+  .menu-nav a {
+    padding: 12px 16px;
+    font-size: 0.85rem;
   }
 }

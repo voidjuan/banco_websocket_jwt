@@ -72,7 +72,7 @@ class cajero extends basedatos
 
     public function consultar()
     {
-        $sql = sprintf("SELECT * FROM cajeros WHERE id = %d", $this->id);
+        $sql = sprintf("SELECT * FROM cajero WHERE id = %d", $this->id);
         $this->conectar();
         $this->ejecutarSQL($sql);
         $res = $this->cargarRegistro();
@@ -91,7 +91,7 @@ class cajero extends basedatos
     public function insertar()
     {
         $sql = sprintf(
-            "INSERT INTO cajeros (nombre, cod_banco, puesto, ranking) VALUES ('%s', %d, '%s', %d)",
+            "INSERT INTO cajero (nombre, cod_banco, puesto, ranking) VALUES ('%s', %d, '%s', %d)",
             $this->nombre,
             $this->cod_banco,
             $this->puesto,
@@ -106,7 +106,7 @@ class cajero extends basedatos
     public function actualizar()
     {
         $sql = sprintf(
-            "UPDATE cajeros SET nombre = '%s', cod_banco = %d, puesto = '%s', ranking = %d WHERE id = %d",
+            "UPDATE cajero SET nombre = '%s', cod_banco = %d, puesto = '%s', ranking = %d WHERE id = %d",
             $this->nombre,
             $this->cod_banco,
             $this->puesto,
@@ -121,7 +121,7 @@ class cajero extends basedatos
 
     public function eliminar()
     {
-        $sql = sprintf("DELETE FROM cajeros WHERE id = %d", $this->id);
+        $sql = sprintf("DELETE FROM cajero WHERE id = %d", $this->id);
         $this->conectar();
         $result = $this->ejecutarSQL($sql);
         $this->desconectar();
@@ -131,7 +131,7 @@ class cajero extends basedatos
     public function listar()
     {
         $sql = "SELECT c.*, b.nombre as nombre_banco 
-                FROM cajeros c 
+                FROM cajero c 
                 LEFT JOIN banco b ON c.cod_banco = b.codigo 
                 ORDER BY c.ranking ASC, c.nombre ASC";
         $this->conectar();
