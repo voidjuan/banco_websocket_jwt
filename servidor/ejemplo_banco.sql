@@ -43,12 +43,12 @@ CREATE TABLE IF NOT EXISTS `banco` (
 -- Volcado de datos para la tabla `banco`
 --
 
-INSERT INTO `banco` (`nombre`, `cod_transaccion`, `created_at`, `updated_at`) VALUES
-('Banco Nacional', 'BNAC-001', '2025-05-08 15:04:21', '2025-05-08 15:04:21'),
-('Banco Comercial', 'BCOM-002', '2025-05-08 15:04:21', '2025-05-08 15:04:21'),
-('Banco de Ahorro', 'BAHO-003', '2025-05-08 15:04:21', '2025-05-08 15:04:21'),
-('Banco Internacional', 'BINT-004', '2025-05-08 15:04:21', '2025-05-08 15:04:21'),
-('Banco Rural', 'BRUR-005', '2025-05-08 15:04:21', '2025-05-08 15:04:21');
+INSERT INTO `banco` (`codigo`, `nombre`, `cod_transaccion`, `created_at`, `updated_at`) VALUES
+(1, 'Banco Nacional', 'BNAC-001', '2025-05-08 15:04:21', '2025-05-08 15:04:21'),
+(2, 'Banco Comercial', 'BCOM-002', '2025-05-08 15:04:21', '2025-05-08 15:04:21'),
+(3, 'Banco de Ahorro', 'BAHO-003', '2025-05-08 15:04:21', '2025-05-08 15:04:21'),
+(4, 'Banco Internacional', 'BINT-004', '2025-05-08 15:04:21', '2025-05-08 15:04:21'),
+(5, 'Banco Rural', 'BRUR-005', '2025-05-08 15:04:21', '2025-05-08 15:04:21');
 
 -- --------------------------------------------------------
 CREATE TABLE usuarios (
@@ -61,16 +61,6 @@ CREATE TABLE usuarios (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-
--- Crear la tabla cajero
-CREATE TABLE IF NOT EXISTS cajero (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    nombre VARCHAR(255) NOT NULL,
-    cod_banco INT NOT NULL,
-    puesto VARCHAR(100) NOT NULL,
-    ranking INT NOT NULL CHECK (ranking BETWEEN 1 AND 5),
-    FOREIGN KEY (cod_banco) REFERENCES banco(codigo) ON DELETE CASCADE ON UPDATE CASCADE
-);
 
 -- Todos los usuarios tienen la contraseña hasheada con bcrypt
 -- La contraseña en texto plano es 'password'
@@ -95,16 +85,6 @@ VALUES ('lector1', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi
 
 INSERT INTO usuarios (username, password, nombre, email, rol) 
 VALUES ('lector2', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Lector Básico', 'lector2@example.com', 'lector');
-
--- CAJEROS
-
-INSERT INTO cajero (nombre, cod_banco, puesto, ranking) VALUES 
-('Cajero Principal Nacional', 6, 'Atención General', 1),
-('Cajero Principal Comercial', 7, 'Atención General', 2),
-('Cajero Principal Ahorro', 8, 'Atención General', 3),
-('Cajero Principal Internacional', 9, 'Atención General', 4),
-('Cajero Principal Rural', 10, 'Atención General', 5);
-
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;

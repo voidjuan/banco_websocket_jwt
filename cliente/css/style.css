@@ -1,0 +1,853 @@
+/* Reset y configuración base */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  color: #333;
+  line-height: 1.6;
+  font-size: 16px;
+}
+
+/* Sección de Login */
+#loginSection {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+#loginSection h1 {
+  text-align: center;
+  color: white;
+  margin-bottom: 30px;
+  font-size: clamp(1.8rem, 4vw, 2.5rem);
+  font-weight: 300;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+#loginForm {
+  margin: 0 auto;
+  background: rgba(255, 255, 255, 0.95);
+  padding: clamp(25px, 5vw, 40px);
+  border-radius: 15px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+  width: 100%;
+  max-width: 400px;
+}
+
+/* Sección Principal */
+#mainSection {
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  min-height: 100vh;
+  padding: clamp(10px, 3vw, 20px);
+}
+
+/* Header */
+.header {
+  background: linear-gradient(135deg, #ffffff 0%, #f7fafc 100%);
+  padding: clamp(15px, 4vw, 30px);
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  margin-bottom: clamp(15px, 4vw, 30px);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
+  border: 1px solid #e2e8f0;
+}
+
+.header h1 {
+  color: #2d3748;
+  font-size: clamp(1.3rem, 4vw, 2rem);
+  font-weight: 600;
+  margin: 0;
+}
+
+.user-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.user-info {
+  color: #4a5568;
+  font-weight: 500;
+  padding: 6px 12px;
+  background: #edf2f7;
+  border-radius: 20px;
+  font-size: clamp(0.8rem, 2.5vw, 0.9rem);
+  text-align: center;
+  min-width: fit-content;
+}
+
+/* Toolbar */
+.toolbar {
+  margin-bottom: 20px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+}
+
+/* Secciones */
+section {
+  margin-top: 20px;
+  background: linear-gradient(135deg, #ffffff 0%, #f7fafc 100%);
+  padding: clamp(15px, 4vw, 25px);
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  margin-bottom: clamp(15px, 4vw, 30px);
+  border: 1px solid #e2e8f0;
+}
+
+section h1 {
+  color: #2d3748;
+  font-size: clamp(1.3rem, 4vw, 1.8rem);
+  font-weight: 600;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 3px solid #667eea;
+}
+
+/* Tablas */
+.table-container {
+  overflow-x: auto;
+  margin-bottom: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  -webkit-overflow-scrolling: touch; /* Suaviza el scroll en iOS */
+  width: 100%;
+  display: block;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  min-width: 100%;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  font-size: clamp(0.8rem, 2.5vw, 0.95rem);
+  table-layout: auto;
+}
+
+.data-table {
+  font-size: clamp(0.75rem, 2.2vw, 0.95rem);
+}
+
+th,
+td {
+  border: none;
+  padding: clamp(8px, 2vw, 16px) clamp(6px, 2vw, 20px);
+  text-align: left;
+  border-bottom: 1px solid #e2e8f0;
+  word-wrap: break-word;
+  vertical-align: top;
+}
+
+th {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: clamp(0.7rem, 2vw, 0.85rem);
+  letter-spacing: 0.5px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+tr:hover {
+  background-color: #f7fafc;
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+/* Botones */
+.btn {
+  padding: clamp(8px, 2vw, 12px) clamp(12px, 3vw, 24px);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: clamp(0.75rem, 2.2vw, 0.9rem);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-decoration: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  min-height: 40px;
+  white-space: nowrap;
+}
+
+.btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+}
+
+.btn-secondary {
+  background: linear-gradient(135deg, #718096 0%, #4a5568 100%);
+  color: white;
+}
+
+.btn-secondary:hover {
+  background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
+}
+
+.btn-danger {
+  background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+  color: white;
+}
+
+.btn-danger:hover {
+  background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+}
+
+.btn-success {
+  background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+  color: white;
+}
+
+.btn-success:hover {
+  background: linear-gradient(135deg, #38a169 0%, #2f855a 100%);
+}
+
+/* Botones en tablas */
+td .btn {
+  padding: 6px 12px;
+  margin: 2px;
+  font-size: clamp(0.7rem, 1.8vw, 0.8rem);
+  border-radius: 6px;
+  min-height: 32px;
+}
+
+/* Contenedor de acciones en tabla */
+.table-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+/* Mensajes de error/aviso */
+#avisoError {
+  color: #e53e3e;
+  font-weight: 600;
+  display: none;
+  margin-bottom: 20px;
+  padding: 12px 16px;
+  background: #fed7d7;
+  border: 1px solid #feb2b2;
+  border-radius: 8px;
+  border-left: 4px solid #e53e3e;
+  font-size: clamp(0.8rem, 2.2vw, 0.9rem);
+}
+
+/* Modales */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(5px);
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modal-content {
+  background-color: white;
+  margin: 2% auto;
+  padding: clamp(15px, 4vw, 30px);
+  border: none;
+  width: 95%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  border-radius: 15px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.modal-content h2 {
+  color: #2d3748;
+  margin-bottom: 20px;
+  font-size: clamp(1.2rem, 3.5vw, 1.5rem);
+  font-weight: 600;
+  text-align: center;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+#bancoModal,
+#cajeroModal {
+  display: none;
+}
+
+.modal-actions {
+  margin-top: 25px;
+  text-align: center;
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* Formularios */
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 600;
+  color: #4a5568;
+  font-size: clamp(0.8rem, 2.2vw, 0.9rem);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: clamp(10px, 2.5vw, 14px) clamp(12px, 3vw, 16px);
+  box-sizing: border-box;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: clamp(0.9rem, 2.5vw, 1rem);
+  transition: all 0.3s ease;
+  background: white;
+  min-height: 40px;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.form-actions {
+  text-align: center;
+  margin-top: 20px;
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.readonly-field {
+  background-color: #f7fafc;
+  padding: clamp(10px, 2.5vw, 14px) clamp(12px, 3vw, 16px);
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  color: #4a5568;
+  font-weight: 500;
+  font-size: clamp(0.9rem, 2.5vw, 1rem);
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+}
+
+.editable-field {
+  display: none;
+}
+
+/* Contenedor de contraseña */
+#passwordContainer {
+  background: #f7fafc;
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  margin-top: 15px;
+}
+
+#passwordContainer label {
+  color: #2d3748;
+  margin-top: 10px;
+}
+
+#passwordContainer label:first-child {
+  margin-top: 0;
+}
+
+/* Estados de carga */
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn:disabled:hover {
+  transform: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Scrollbar personalizada */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+}
+
+/* MEDIA QUERIES RESPONSIVE */
+
+/* Tablets y pantallas medianas */
+@media (max-width: 1024px) {
+  .header {
+    flex-direction: column;
+    text-align: center;
+    gap: 15px;
+  }
+  
+  .user-controls {
+    justify-content: center;
+    width: 100%;
+  }
+  
+  .toolbar {
+    justify-content: center;
+  }
+  
+  .table-container {
+    margin-left: -15px;
+    margin-right: -15px;
+    border-radius: 0;
+  }
+  
+  table {
+    border-radius: 0;
+    width: 100%;
+    min-width: unset;
+    table-layout: fixed;
+  }
+  
+  th, td {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+  
+  /* Distribución específica de columnas para bancos */
+  table#tablaBancos th:nth-child(1),
+  table#tablaBancos td:nth-child(1) { width: 15%; }
+  table#tablaBancos th:nth-child(2),
+  table#tablaBancos td:nth-child(2) { width: 35%; }
+  table#tablaBancos th:nth-child(3),
+  table#tablaBancos td:nth-child(3) { width: 25%; }
+  table#tablaBancos th:nth-child(4),
+  table#tablaBancos td:nth-child(4) { width: 25%; }
+  
+  /* Distribución específica de columnas para cajeros */
+  table#tablaCajeros th:nth-child(1),
+  table#tablaCajeros td:nth-child(1) { width: 10%; }
+  table#tablaCajeros th:nth-child(2),
+  table#tablaCajeros td:nth-child(2) { width: 25%; }
+  table#tablaCajeros th:nth-child(3),
+  table#tablaCajeros td:nth-child(3) { width: 15%; }
+  table#tablaCajeros th:nth-child(4),
+  table#tablaCajeros td:nth-child(4) { width: 20%; }
+  table#tablaCajeros th:nth-child(5),
+  table#tablaCajeros td:nth-child(5) { width: 10%; }
+  table#tablaCajeros th:nth-child(6),
+  table#tablaCajeros td:nth-child(6) { width: 20%; }
+}
+
+/* Móviles grandes */
+@media (max-width: 768px) {
+  body {
+    font-size: 14px;
+  }
+  
+  .header {
+    padding: 15px;
+    margin-bottom: 15px;
+  }
+  
+  .header h1 {
+    font-size: 1.4rem;
+  }
+  
+  .user-info {
+    font-size: 0.8rem;
+    padding: 6px 10px;
+  }
+  
+  section {
+    padding: 15px;
+    margin-bottom: 15px;
+  }
+  
+  .table-container {
+    margin: 0 -15px 20px -15px;
+    box-shadow: none;
+    width: calc(100% + 30px);
+  }
+  
+  table {
+    width: 100%;
+    min-width: unset;
+    font-size: 0.8rem;
+    table-layout: fixed;
+  }
+  
+  th, td {
+    padding: 8px 4px;
+    white-space: normal;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+  
+  /* Distribución mejorada para móviles - tabla bancos */
+  table#tablaBancos th:nth-child(1),
+  table#tablaBancos td:nth-child(1) { width: 12%; }
+  table#tablaBancos th:nth-child(2),
+  table#tablaBancos td:nth-child(2) { width: 38%; }
+  table#tablaBancos th:nth-child(3),
+  table#tablaBancos td:nth-child(3) { width: 22%; }
+  table#tablaBancos th:nth-child(4),
+  table#tablaBancos td:nth-child(4) { width: 28%; }
+  
+  /* Distribución mejorada para móviles - tabla cajeros */
+  table#tablaCajeros th:nth-child(1),
+  table#tablaCajeros td:nth-child(1) { width: 8%; }
+  table#tablaCajeros th:nth-child(2),
+  table#tablaCajeros td:nth-child(2) { width: 22%; }
+  table#tablaCajeros th:nth-child(3),
+  table#tablaCajeros td:nth-child(3) { width: 12%; }
+  table#tablaCajeros th:nth-child(4),
+  table#tablaCajeros td:nth-child(4) { width: 22%; }
+  table#tablaCajeros th:nth-child(5),
+  table#tablaCajeros td:nth-child(5) { width: 10%; }
+  table#tablaCajeros th:nth-child(6),
+  table#tablaCajeros td:nth-child(6) { width: 26%; }
+  
+  td .btn {
+    padding: 3px 6px;
+    font-size: 0.65rem;
+    margin: 1px 0;
+    min-height: 26px;
+    display: block;
+    width: 100%;
+    text-align: center;
+  }
+  
+  .table-actions {
+    gap: 2px;
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .modal-content {
+    width: 98%;
+    margin: 5% auto;
+    max-height: 85vh;
+  }
+  
+  .form-actions,
+  .modal-actions {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .toolbar .btn {
+    width: auto;
+    flex: 1;
+    min-width: 120px;
+  }
+  
+  .user-controls .btn {
+    width: auto;
+    flex: 1;
+  }
+}
+
+/* Móviles pequeños */
+@media (max-width: 480px) {
+  #loginSection {
+    padding: 15px;
+  }
+  
+  #loginForm {
+    padding: 20px;
+  }
+  
+  #loginSection h1 {
+    font-size: 1.6rem;
+    margin-bottom: 20px;
+  }
+  
+  .header {
+    padding: 12px;
+  }
+  
+  .header h1 {
+    font-size: 1.2rem;
+  }
+  
+  section {
+    padding: 12px;
+  }
+  
+  section h1 {
+    font-size: 1.2rem;
+    margin-bottom: 12px;
+  }
+  
+  .table-container {
+    margin: 0 -12px 15px -12px;
+    width: calc(100% + 24px);
+  }
+  
+  table {
+    width: 100%;
+    min-width: unset;
+    font-size: 0.75rem;
+    table-layout: fixed;
+  }
+  
+  th, td {
+    padding: 6px 2px;
+    font-size: 0.75rem;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: normal;
+  }
+  
+  /* Ancho específico para tabla de bancos en móviles pequeños */
+  table#tablaBancos th:nth-child(1),
+  table#tablaBancos td:nth-child(1) { width: 10%; font-size: 0.7rem; }
+  table#tablaBancos th:nth-child(2),
+  table#tablaBancos td:nth-child(2) { width: 40%; }
+  table#tablaBancos th:nth-child(3),
+  table#tablaBancos td:nth-child(3) { width: 20%; font-size: 0.7rem; }
+  table#tablaBancos th:nth-child(4),
+  table#tablaBancos td:nth-child(4) { width: 30%; }
+  
+  /* Ancho específico para tabla de cajeros en móviles pequeños */
+  table#tablaCajeros th:nth-child(1),
+  table#tablaCajeros td:nth-child(1) { width: 7%; font-size: 0.7rem; }
+  table#tablaCajeros th:nth-child(2),
+  table#tablaCajeros td:nth-child(2) { width: 25%; }
+  table#tablaCajeros th:nth-child(3),
+  table#tablaCajeros td:nth-child(3) { width: 10%; font-size: 0.7rem; }
+  table#tablaCajeros th:nth-child(4),
+  table#tablaCajeros td:nth-child(4) { width: 23%; }
+  table#tablaCajeros th:nth-child(5),
+  table#tablaCajeros td:nth-child(5) { width: 8%; font-size: 0.7rem; }
+  table#tablaCajeros th:nth-child(6),
+  table#tablaCajeros td:nth-child(6) { width: 27%; }
+  
+  td .btn {
+    padding: 2px 4px;
+    font-size: 0.6rem;
+    min-height: 22px;
+    margin: 1px 0;
+    display: block;
+    width: 100%;
+  }
+  
+  .modal-content {
+    width: 100%;
+    height: 100vh;
+    margin: 0;
+    border-radius: 0;
+    max-height: 100vh;
+  }
+  
+  .user-info {
+    font-size: 0.75rem;
+    padding: 4px 8px;
+    word-break: break-word;
+  }
+  
+  .toolbar {
+    gap: 5px;
+  }
+  
+  .toolbar .btn {
+    font-size: 0.7rem;
+    padding: 6px 8px;
+  }
+}
+
+/* Móviles muy pequeños */
+@media (max-width: 360px) {
+  body {
+    font-size: 13px;
+  }
+  
+  .header h1 {
+    font-size: 1.1rem;
+  }
+  
+  section h1 {
+    font-size: 1.1rem;
+  }
+  
+  .table-container {
+    width: calc(100% + 20px);
+  }
+  
+  table {
+    width: 100%;
+    min-width: unset;
+    table-layout: fixed;
+  }
+  
+  th, td {
+    padding: 4px 1px;
+    font-size: 0.65rem;
+    word-wrap: break-word;
+  }
+  
+  /* Distribución ultra compacta para móviles muy pequeños */
+  table#tablaBancos th:nth-child(1),
+  table#tablaBancos td:nth-child(1) { width: 8%; font-size: 0.6rem; }
+  table#tablaBancos th:nth-child(2),
+  table#tablaBancos td:nth-child(2) { width: 42%; font-size: 0.65rem; }
+  table#tablaBancos th:nth-child(3),
+  table#tablaBancos td:nth-child(3) { width: 18%; font-size: 0.6rem; }
+  table#tablaBancos th:nth-child(4),
+  table#tablaBancos td:nth-child(4) { width: 32%; }
+  
+  table#tablaCajeros th:nth-child(1),
+  table#tablaCajeros td:nth-child(1) { width: 6%; font-size: 0.6rem; }
+  table#tablaCajeros th:nth-child(2),
+  table#tablaCajeros td:nth-child(2) { width: 26%; }
+  table#tablaCajeros th:nth-child(3),
+  table#tablaCajeros td:nth-child(3) { width: 8%; font-size: 0.6rem; }
+  table#tablaCajeros th:nth-child(4),
+  table#tablaCajeros td:nth-child(4) { width: 24%; }
+  table#tablaCajeros th:nth-child(5),
+  table#tablaCajeros td:nth-child(5) { width: 7%; font-size: 0.6rem; }
+  table#tablaCajeros th:nth-child(6),
+  table#tablaCajeros td:nth-child(6) { width: 29%; }
+  
+  .user-info {
+    font-size: 0.7rem;
+  }
+  
+  td .btn {
+    padding: 1px 2px;
+    font-size: 0.55rem;
+    min-height: 20px;
+    margin: 0.5px 0;
+  }
+}
+
+/* Landscape móviles */
+@media (max-height: 500px) and (orientation: landscape) {
+  .modal-content {
+    height: 95vh;
+    margin: 1% auto;
+  }
+  
+  #loginSection h1 {
+    font-size: 1.4rem;
+    margin-bottom: 15px;
+  }
+  
+  #loginForm {
+    padding: 20px;
+  }
+}
+
+/* Mejoras para accesibilidad táctil */
+@media (pointer: coarse) {
+  .btn {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  td .btn {
+    min-height: 36px;
+    min-width: 36px;
+  }
+  
+  .form-group input,
+  .form-group select {
+    min-height: 44px;
+  }
+}
+
+/* Animaciones optimizadas para dispositivos con menos potencia */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  .btn:hover {
+    transform: none;
+  }
+  
+  tr:hover {
+    transform: none;
+  }
+}
