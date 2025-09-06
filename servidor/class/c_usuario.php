@@ -71,6 +71,22 @@ class usuario extends basedatos
         $this->rol = $rol;
     }
 
+    /**
+     * Actualiza solo la contraseña del usuario
+     */
+    protected function actualizarPassword()
+    {
+        $sql = sprintf(
+            "UPDATE usuarios SET password = '%s' WHERE id = %d",
+            $this->password, // Ya hasheada por setPassword
+            $this->id
+        );
+        $this->conectar();
+        $result = $this->ejecutarSQL($sql);
+        $this->desconectar();
+        return $result;
+    }
+
     // Métodos CRUD
 
     /**

@@ -64,6 +64,10 @@ const vistaBancos = document.getElementById("vistaBancos")
 const vistaCajeros = document.getElementById("vistaCajeros")
 const tituloVista = document.getElementById("tituloVista")
 
+// Nuevo elemento del DOM para el botón de guardar contraseña
+const guardarPasswordBtn = document.getElementById("guardarPasswordBtn");
+const cancelarPasswordBtn = document.getElementById("cancelarPasswordBtn");
+
 // Toggle menú hamburguesa
 if (menuToggle) {
   menuToggle.addEventListener("click", () => {
@@ -256,6 +260,21 @@ socket.onmessage = (event) => {
           cargarCajeros() // refrescamos también cajeros
         }
         break
+
+        case "cambiarPassword":
+        if (response.status === "success") {
+          mostrarAviso("Contraseña cambiada correctamente", false);
+          // Opcional: Recargar perfil para confirmar
+          socket.send(
+            JSON.stringify({
+              action: "perfil",
+              token: token,
+            })
+          );
+        } else {
+          mostrarAviso(response.message || "Error al cambiar contraseña");
+        }
+        break;
 
       default:
         if (response.status === "error") {
@@ -676,13 +695,64 @@ if (cancelarEdicionBtn) {
   cancelarEdicionBtn.addEventListener("click", cancelarEdicionPerfil)
 }
 
+// Cambiar contraseña
 if (cambiarPasswordBtn) {
   cambiarPasswordBtn.addEventListener("click", () => {
-    if (passwordContainer) passwordContainer.style.display = "block"
-    if (currentPassword) currentPassword.value = ""
-    if (newPassword) newPassword.value = ""
-    if (confirmPassword) confirmPassword.value = ""
-  })
+    if (passwordContainer) passwordContainer.style.display = "block";
+    if (currentPassword) currentPassword.value = "";
+    if (newPassword) newPassword.value = "";
+    if (confirmPassword) confirmPassword.value = "";
+  });
+}
+
+// Nuevo: Event listener para guardar contraseña
+if (guardarPasswordBtn) {
+  guardarPasswordBtn.addEventListener("click", () => {
+    const currentPass = currentPassword?.value.trim();
+    const newPass = newPassword?.value.trim();
+    const confirmPass = confirmPassword?.value.trim();
+
+    if (!currentPass || !newPass || !confirmPass) {
+      mostrarAviso("Por favor complete todos los campos de contraseña");
+      return;
+    }
+
+    if (newPass !== confirmPass) {
+      mostrarAviso("La nueva contraseña y la confirmación no coinciden");
+      return;
+    }
+
+    if (newPass.length < 6) {
+      mostrarAviso("La nueva contraseña debe tener al menos 6 caracteres");
+      return;
+    }
+
+    // Enviar al servidor
+    socket.send(
+      JSON.stringify({
+        action: "cambiarPassword",
+        currentPassword: currentPass,
+        newPassword: newPass,
+        token: token,
+      })
+    );
+
+    // Ocultar contenedor después de enviar (se maneja respuesta en onmessage)
+    if (passwordContainer) passwordContainer.style.display = "none";
+    if (currentPassword) currentPassword.value = "";
+    if (newPassword) newPassword.value = "";
+    if (confirmPassword) confirmPassword.value = "";
+  });
+}
+
+// Nuevo: Event listener para cancelar cambio de contraseña
+if (cancelarPasswordBtn) {
+  cancelarPasswordBtn.addEventListener("click", () => {
+    if (passwordContainer) passwordContainer.style.display = "none";
+    if (currentPassword) currentPassword.value = "";
+    if (newPassword) newPassword.value = "";
+    if (confirmPassword) confirmPassword.value = "";
+  });
 }
 
 // Event Listeners para cajeros

@@ -70,6 +70,10 @@ class BancoWebSocket implements MessageComponentInterface
                     $this->handlePerfil($from, $response);
                     break;
 
+                case 'cambiarPassword':
+                    $this->handleCambiarPassword($from, $data, $response);
+                    break;
+
                 case 'listar':
                     $this->handleListar($from, $response);
                     break;
@@ -197,6 +201,35 @@ class BancoWebSocket implements MessageComponentInterface
             'email' => $usuario->getEmail(),
             'rol' => $usuario->getRol()
         ];
+    }
+
+    private function handleCambiarPassword(ConnectionInterface $conn, array $data, array &$response)
+    {
+        $this->verificarAutenticacion($conn); // Cualquiera autenticado puede cambiar su propia pass
+    
+        if (!isset($data['currentPassword']) || !isset($data['newPassword'])) {
+            throw new Exception('Contraseña actual y nueva son requeridas');
+        }
+    
+        $usuario = $this->usuariosConectados[$conn->resourceId]['usuario'];
+    
+        // Verificar contraseña actual
+        if (!$usuario->verificarPassword($data['currentPassword'])) {
+            throw new Exception('Contraseña actual incorrecta');
+        }
+    
+        // Actualizar contraseña
+        $usuario->setPassword($data['newPassword']); // Esto hashea automáticamente
+        if (!$usuario->actualizarPassword()) { // Usar el nuevo método
+            throw new Exception('Error al actualizar la contraseña');
+        }
+
+        // Regenerar token por seguridad (opcional, pero recomendado)
+        $nuevoToken = $this->generarToken($usuario);
+        $this->usuariosConectados[$conn->resourceId]['token'] = $nuevoToken;
+
+        $response['token'] = $nuevoToken; // Enviar nuevo token al cliente
+        $response['message'] = 'Contraseña actualizada exitosamente';
     }
 
     private function handleListar(ConnectionInterface $conn, array &$response)
